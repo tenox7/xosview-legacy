@@ -1,51 +1,41 @@
-//
-//  Copyright (c) 1999, 2006 by Mike Romberg (mike.romberg@noaa.gov)
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1999, 2006 by Mike Romberg (mike.romberg@noaa.gov)
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _DISKMETER_H_
 #define _DISKMETER_H_
 
-#include "fieldmetergraph.h"
-#include "xosview.h"
-#include <map>
-#include <string>
+#include "fieldmeter.h"
 
-typedef std::map<std::string, unsigned long> diskmap;
+/*  Sector counts from the last sysfs sample, one entry per disk.  This
+ *  stands in for the std::map the C++ version kept; a machine has few
+ *  enough disks that a linear scan is not worth improving on.  */
+typedef struct {
+  char name[32];
+  unsigned long value;
+} DiskEntry;
 
+typedef struct {
+  DiskEntry *e;
+  int n, cap;
+} DiskMap;
 
-class DiskMeter : public FieldMeterGraph
-    {
-    public:
-        DiskMeter( XOSView *parent, float max );
-        ~DiskMeter( void );
+typedef struct {
+  FieldMeter f;
 
-        const char *name( void ) const { return "DiskMeter"; }
-        void checkevent( void );
+  /*  sysfs  */
+  DiskMap sysfs_read_prev, sysfs_write_prev;
+  int sysfs;
 
-        void checkResources( void );
-    protected:
+  unsigned long read_prev;
+  unsigned long write_prev;
+  float maxspeed;
+  int vmstat;
+  const char *statFileName;
+} DiskMeter;
 
-        // sysfs:
-        void update_info(const diskmap &reads, const diskmap &writes);
-        void getsysfsdiskinfo( void );
-
-        void getdiskinfo( void );
-        void getvmdiskinfo( void );
-        void updateinfo(unsigned long one, unsigned long two,
-          int fudgeFactor);
-    private:
-
-        // sysfs:
-        diskmap sysfs_read_prev_, sysfs_write_prev_;
-        bool _sysfs;
-
-        unsigned long int read_prev_;
-        unsigned long int write_prev_;
-        float maxspeed_;
-        bool _vmstat;
-        const char *_statFileName;
-    };
+Meter *diskmeter_new(XOSView *parent, float max);
 
 #endif

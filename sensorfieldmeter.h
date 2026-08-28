@@ -1,36 +1,35 @@
-//
-//  Copyright (c) 2014 by Tomi Tapper <tomi.o.tapper@jyu.fi>
-//
-//  This file may be distributed under terms of the GPL
-//
-//  Put code common to *BSD and Linux sensor meters here.
-//
+/*
+ *  Copyright (c) 2014 by Tomi Tapper <tomi.o.tapper@jyu.fi>
+ *
+ *  This file may be distributed under terms of the GPL
+ *
+ *  Put code common to *BSD and Linux sensor meters here.
+ */
 
 #ifndef _SENSORFIELDMETER_H_
 #define _SENSORFIELDMETER_H_
 
 #include "fieldmeter.h"
-#include "xosview.h"
 
+typedef struct {
+  FieldMeter f;
+  char unit[8];
+  double high, low;
+  int has_high, has_low, negative;
+  unsigned long actcolor, highcolor, lowcolor;
+} SensorFieldMeter;
 
-class SensorFieldMeter : public FieldMeter {
-public:
-  SensorFieldMeter( XOSView *parent, const char *title = "",
-                    const char *legend = "", int docaptions = 0,
-                    int dolegends = 0, int dousedlegends = 0 );
-  ~SensorFieldMeter( void );
+void sensorfieldmeter_init(SensorFieldMeter *sm, XOSView *parent,
+                           const char *name, const char *title,
+                           const char *legend, int docaptions, int dolegends,
+                           int dousedlegends);
 
-protected:
-  void updateLegend( void );
-  void checkFields( double low, double high );
-  char unit_[8];
-  double high_, low_;
-  bool has_high_, has_low_, negative_;
-  unsigned long actcolor_, highcolor_, lowcolor_;
+void sensorfieldmeter_updatelegend(SensorFieldMeter *sm);
 
-private:
-
-};
-
+/*  Check if the meter needs to be flipped, or the total or limits changed,
+ *  and whether an alarm limit has been reached.  Call after reading the
+ *  values.  */
+void sensorfieldmeter_checkfields(SensorFieldMeter *sm, double low,
+                                  double high);
 
 #endif

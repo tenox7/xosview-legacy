@@ -1,47 +1,31 @@
-//
-//  Copyright (c) 1999, 2006 Thomas Waldmann ( ThomasWaldmann@gmx.de )
-//  based on work of Mike Romberg ( mike.romberg@noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1999, 2006 Thomas Waldmann ( ThomasWaldmann@gmx.de )
+ *  based on work of Mike Romberg ( mike.romberg@noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
+
 #ifndef _RAIDMETER_H_
 #define _RAIDMETER_H_
 
 #include "bitfieldmeter.h"
-#include "xosview.h"
 
 #define MAX_MD 8
 
-class RAIDMeter : public BitFieldMeter {
-public:
-  RAIDMeter( XOSView *parent, int raiddev = 0);
-  ~RAIDMeter( void );
+typedef struct {
+  BitFieldMeter b;
 
-  void checkevent( void );
+  int raiddev;
 
-  void checkResources( void );
+  char state[20];
+  char type[20];
+  char working_map[20];
+  char resync_state[20];
+  int disknum;
 
-  static int countRAIDs( void );
+  unsigned long doneColor, todoColor, completeColor;
+} RAIDMeter;
 
-protected:
-
-  int _raiddev;
-  static int mdnum;
-
-  char state[20],
-       type[20],
-       working_map[20],
-       resync_state[20];
-  int  disknum;
-
-  unsigned long doneColor_, todoColor_, completeColor_;
-
-  int find1(const char *key, const char *findwhat, int num1);
-  int find2(const char *key, const char *findwhat, int num1, int num2);
-
-  int raidparse(char *cp);
-
-  void getRAIDstate( void );
-};
+Meter *raidmeter_new(XOSView *parent, int raiddev);
 
 #endif

@@ -1,40 +1,29 @@
-//
-//  Copyright (c) 1994, 1995, 2004, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1994, 1995, 2004, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
-#include "fieldmetergraph.h"
-#include "xosview.h"
+#include "fieldmeter.h"
 
+typedef struct {
+  FieldMeter f;
+  int lineNum;
+  unsigned long long cputime[2][10];
+  int cpuindex;
+  int kernel;
+  int statfields;
+} CPUMeter;
 
-class CPUMeter : public FieldMeterGraph {
-public:
-  CPUMeter(XOSView *parent, const char *cpuID = "cpu");
-  ~CPUMeter(void);
+/*  cpuID is a /proc/stat line prefix: "cpu" for the aggregate, "cpu0" and
+ *  so on for one processor.  */
+Meter *cpumeter_new(XOSView *parent, const char *cpuID);
 
-  const char *name(void) const { return "CPUMeter"; }
-  void checkevent(void);
-
-  void checkResources(void);
-
-  static int countCPUs(void);
-  static const char *cpuStr(int num);
-  static int getkernelversion(void);
-protected:
-  int _lineNum;
-  unsigned long long cputime_[2][10];
-  int cpuindex_;
-  int kernel_;
-  int statfields_;
-
-  void getcputime(void);
-  int findLine(const char *cpuID);
-  const char *toUpper(const char *str);
-private:
-};
+int cpumeter_countcpus(void);
+const char *cpumeter_cpustr(int num);
+int cpumeter_kernelversion(void);
 
 #endif

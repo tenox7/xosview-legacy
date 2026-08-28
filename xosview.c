@@ -192,6 +192,15 @@ int xosview_isresourcetrue(XOSView *xv, const char *name) {
   return xwin_isresourcetrue((XWin *)xv, name);
 }
 
+const char *xosview_getresource_default(XOSView *xv, const char *name,
+                                        const char *defaultVal) {
+  return xwin_getresource_default((XWin *)xv, name, defaultVal);
+}
+
+void xosview_setdone(XOSView *xv, int val) {
+  xwin_setdone((XWin *)xv, val);
+}
+
 /*---------------------------------------------------------------------------*/
 
 static void checkVersion(int argc, char **argv) {

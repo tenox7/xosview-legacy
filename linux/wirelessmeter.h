@@ -1,41 +1,27 @@
-//
-//  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
-//
+/*
+ *  Copyright (c) 1997 by Mike Romberg ( romberg@fsl.noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _WIRELESSMETER_H_
 #define _WIRELESSMETER_H_
 
-#include "fieldmetergraph.h"
-#include "xosview.h"
-#include <string>
+#include "fieldmeter.h"
 
-static const char WLFILENAME[] = "/proc/net/wireless";
+extern const char WLFILENAME[];
 
+typedef struct {
+  FieldMeter f;
+  unsigned long poorqualcol, fairqualcol, goodqualcol;
+  int lastquality, number;
+  char devname[32];
+  int lastlink;
+} WirelessMeter;
 
-class WirelessMeter : public FieldMeterGraph {
-public:
-  WirelessMeter( XOSView *parent, int ID = 0, const char *wlID = "WL");
-  ~WirelessMeter( void );
+Meter *wirelessmeter_new(XOSView *parent, int ID, const char *wlID);
 
-  const char *name( void ) const { return "WirelessMeter"; }
-  void checkevent( void );
-
-  void checkResources( void );
-  static int countdevices(void);
-  static const char *wirelessStr(int num);
-
-protected:
-  void getpwrinfo( void );
-
-private:
-  unsigned long _poorqualcol, _fairqualcol, _goodqualcol;
-  int _lastquality, _number;
-  std::string _devname;
-  bool _lastlink;
-};
-
+int wirelessmeter_countdevices(void);
+const char *wirelessmeter_str(int num);
 
 #endif
