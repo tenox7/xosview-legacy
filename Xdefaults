@@ -122,7 +122,7 @@ xosview*netOutColor:        SlateBlue1
 xosview*netBackground:      aquamarine
 xosview*netPriority:        2
 xosview*netDecay:           True
-xosview*netGraph:           True
+xosview*netGraph:           False
 xosview*netUsedFormat:	    autoscale
 xosview*netIface:           False
 
@@ -204,7 +204,7 @@ xosview*diskBandwidth:      100000000 ! 100MB/s
 xosview*diskPriority:	    10
 xosview*diskDecay:	    True
 xosview*diskUsedFormat:     autoscale
-xosview*diskGraph:	    True
+xosview*diskGraph:	    False
 
 
 xosview*RAID:                 False
