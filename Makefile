@@ -134,6 +134,19 @@ OBJS += hpux/MeterMaker.o \
 CPPFLAGS += -Ihpux/
 endif
 
+ifeq ($(PLATFORM), osf1)
+OBJS += osf1/MeterMaker.o \
+        osf1/cpumeter.o \
+        osf1/loadmeter.o \
+        osf1/memmeter.o \
+        osf1/osf1stats.o \
+        osf1/pagemeter.o \
+        osf1/swapmeter.o
+CPPFLAGS += -Iosf1/ -DNO_XPM
+XPMLIB =
+LDLIBS += -lm
+endif
+
 ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \

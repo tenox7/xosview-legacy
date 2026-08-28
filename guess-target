@@ -9,6 +9,7 @@ t=
 case "$s" in
   Linux)       t=linux ;;
   GNU)         t=gnu ;;
+  OSF1)        t=osf1 ;;
   FreeBSD)     t=freebsd ;;
   NetBSD)      t=netbsd ;;
   OpenBSD)     t=openbsd ;;

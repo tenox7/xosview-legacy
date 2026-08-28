@@ -1,0 +1,46 @@
+
+
+  The Tru64 port covers Tru64 UNIX, Digital UNIX and OSF/1, and provides
+  these meters:
+
+    - load meter
+    - cpu meter:  user | nice | system | io-wait | idle
+    - mem meter:  used | cache | free
+    - swap meter: used | free
+    - page meter: in | out | idle
+
+  None of them need any privileges.
+
+  Building
+  --------
+
+    gmake
+
+  targets/osf1 builds with the Compaq C++ compiler, cxx.  Set CXX=g++ if
+  that is what is installed.  Tru64 ships no libXpm, so the target builds
+  with -DNO_XPM, which drops support for the pixmapName resource and
+  leaves everything else intact.
+
+  Where the numbers come from
+  ---------------------------
+
+  Everything goes through the small interface in osf1/osf1stats.h.  Load,
+  cpu and swap come from table(2) -- TBL_LOADAVG, TBL_SYSINFO and
+  TBL_SWAPINFO -- and real memory and paging from the Mach vm_statistics()
+  call, which is the only place the page queues are published.
+
+  The mem meter shows the inactive queue as cache: that is where the
+  unified buffer cache parks clean file pages, which the kernel reclaims
+  under memory pressure.  Wired-down UBC pages are counted in wire_count
+  and so land under used, which reads high during heavy file i/o.
+
+  The page meter counts every page fault serviced from disk, not just
+  traffic to and from swap, because vm_statistics() does not separate them.
+
+  Untested
+  --------
+
+  This port has not yet been built or run on real hardware.  The one figure
+  most likely to need correcting is the unit TBL_SWAPINFO reports partition
+  sizes in; osf1/osf1stats.cc assumes 512 byte blocks and names the
+  constant SWAPBLOCK for that reason.

@@ -112,8 +112,8 @@ horizontal bar which is separated into color coded regions showing how
 much of the resource is being put to a particular use.
 
 \fIxosview\fP runs on several platforms (Linux, NetBSD, FreeBSD,
-OpenBSD, DragonflyBSD, some Solaris systems, IRIX 6.5, HPUX, AIX 4.x
-and 5.x, and GNU).
+OpenBSD, DragonflyBSD, some Solaris systems, IRIX 6.5, HPUX,
+AIX 4.x and 5.x, Tru64, and GNU).
 Not all of the meters described below are supported on all platforms.
 Some of the meters may appear different depending upon the platform
 \fIxosview\fP is running on.  Note that *BSD is used as an
@@ -134,6 +134,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    IRIX   : user | system | interrupt | wait | idle
    HPUX   : user | nice | system | interrupt | idle
    AIX    : user | system | io-wait | idle
+   Tru64  : user | nice | system | io-wait | idle
 
 \fBMemory Usage\fP
    Linux  : used | buffers | slab | map | cache | free
@@ -145,6 +146,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    IRIX   : kernel | fs | user | free
    HPUX   : text | used | other | free
    AIX    : used | cache | free
+   Tru64  : used | cache | free
    GNU    : active | inactive | wired | free
 
 \fBSwap Usage\fP
@@ -153,6 +155,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    SunOS5 : used | free
    HPUX   : used | free
    AIX    : used | free
+   Tru64  : used | free
    GNU    : used | free
 
 \fBDisk Usage\fP: Throughput to/from local disk, per second
@@ -167,6 +170,7 @@ FreeBSD, OpenBSD, DragonflyBSD).
    SunOS5 : in | out | idle
    HPUX   : in | out | idle
    AIX    : in | out | idle
+   Tru64  : in | out | idle
    GNU    : in | out | idle
 
 \fBNetwork Usage\fP
