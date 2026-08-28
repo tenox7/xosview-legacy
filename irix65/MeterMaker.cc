@@ -8,7 +8,9 @@
 
 #include "cpumeter.h"
 #include "memmeter.h"
+#ifndef IRIX5
 #include "gfxmeter.h"
+#endif
 #include "diskmeter.h"
 
 #include <stdlib.h>
@@ -63,8 +65,10 @@ void MeterMaker::makeMeters(void)
     }
 
 
+#ifndef IRIX5
     if( _xos->isResourceTrue("gfx") && GfxMeter::nPipes() > 0 )
         push(new GfxMeter( _xos, atoi( _xos->getResource( "gfxWarnThreshold" ))));
+#endif
 
     if (_xos->isResourceTrue("mem"))
         push(new MemMeter(_xos));

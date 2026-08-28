@@ -1,0 +1,25 @@
+PLATFORM = irix65
+CXX = g++
+#  The graphics pipe meter is 6.5 only.
+IRIXGFX =
+#  -isystem /usr/include puts SGI's headers behind gcc's own, and gcc fakes
+#  _COMPILER_VERSION, which makes SGI's offsetof() reach for the MIPSpro
+#  builtin __INTADDR__ that gcc does not have.
+CPPFLAGS += -DIRIX5 -isystem /usr/include -U_COMPILER_VERSION
+LDLIBS += -lm
+
+#  gcc for 5.3 comes from tgcware and cannot drive the linker itself: the
+#  crt objects and the gcc runtime have to be named by hand, and ld needs
+#  the gcc init and fini entry points.  Adjust these two paths to match what
+#  is installed.
+IRIX5_GCCLIB = /usr/tgcware/gcc45/lib/gcc/mips-sgi-irix5.3/4.5.3
+IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
+LINK = $(IRIX5_LD) -o $@ -init __gcc_init -fini __gcc_fini \
+  /usr/lib/crt1.o $(IRIX5_GCCLIB)/irix-crti.o $(IRIX5_GCCLIB)/crtbegin.o \
+  -L$(IRIX5_GCCLIB) -L$(IRIX5_GCCLIB)/../../.. -L/usr/lib $(LDFLAGS) \
+  $^ $(LDLIBS) -lstdc++ -lgcc -lgcc_eh -lc \
+  $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
+
+#  5.3 has no libXpm; only the pixmapName resource is lost.
+XPMLIB =
+CPPFLAGS += -DNO_XPM

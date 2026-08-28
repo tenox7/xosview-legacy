@@ -117,10 +117,12 @@ ifeq ($(PLATFORM), irix65)
 OBJS += irix65/MeterMaker.o \
         irix65/cpumeter.o \
         irix65/diskmeter.o \
-        irix65/gfxmeter.o \
         irix65/loadmeter.o \
         irix65/memmeter.o \
         irix65/sarmeter.o
+#  The graphics pipe meter is 6.5 only; targets/irix5 clears this.
+IRIXGFX ?= irix65/gfxmeter.o
+OBJS += $(IRIXGFX)
 CPPFLAGS += -Iirix65/
 endif
 
@@ -231,8 +233,12 @@ DEPS := $(OBJS:.o=.d) $(notdir $(OBJS:.o=.d))
 %: %.cc
 %: %.o
 
+#  Toolchains that can not drive the linker themselves override this; see
+#  targets/irix5.
+LINK ?= $(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
 xosview:	$(OBJS)
-		$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+		$(LINK)
 
 defaultstring.cc:	Xdefaults defresources.awk
 		$(AWK) -f defresources.awk Xdefaults > defaultstring.cc

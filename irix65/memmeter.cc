@@ -61,12 +61,20 @@ void MemMeter::getmeminfo(void)
 
     fields_[0] = total_ - (mp.availrmem + mp.bufmem);
 
+#ifdef IRIX5
+    //  5.3 predates the chunk allocator, so the file system share of memory
+    //  is just the buffer cache.
+    fields_[1] = mp.bufmem;
+
+    fields_[2] = mp.availrmem - mp.freemem;
+#else
     fields_[1] = mp.bufmem +
         mp.dchunkpages + mp.dpages +
         mp.chunkpages - mp.dchunkpages;
 
     fields_[2] = mp.availrmem -
         (mp.freemem + mp.chunkpages + mp.dpages);
+#endif
 
     fields_[3] = mp.freemem;
 

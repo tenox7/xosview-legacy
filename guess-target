@@ -15,7 +15,7 @@ case "$s" in
   NetBSD)      t=netbsd ;;
   OpenBSD)     t=openbsd ;;
   DragonFly)   t=dragonflybsd ;;
-  IRIX|IRIX64) t=irix65 ;;
+  IRIX|IRIX64) case "$r" in 5.*) t=irix5 ;; *) t=irix65 ;; esac ;;
   #  Only OpenServer 6 is supported; uname -v is what separates it from 5.
   SCO_SV)      case "$v" in 6.*) t=osr6 ;; esac ;;
   UnixWare|UNIX_SV) t=unixware ;;
