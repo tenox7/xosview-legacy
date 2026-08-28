@@ -13,7 +13,7 @@ static int MAX_SWAP_AREAS = 16;
 
 //  Size of one swap pool, in 1 KB blocks.
 static unsigned long swapblocks( const struct pst_swapinfo &si ){
-#ifdef HPUX9
+#ifdef NO_PSS_NBLKSENABLED
 //  HP-UX 9 has no pss_nblksenabled and keeps the size of a block device
 //  pool and of a file system pool in a union instead.
   if ( !(si.pss_flags & SW_ENABLED) )

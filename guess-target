@@ -22,6 +22,7 @@ case "$s" in
   #  aCC, which only exists from 11.x on.
   HP-UX)       case "$r" in
                  *.09.*) t=hpux9 ;;
+                 *.10.*) t=hpux10 ;;
                  *.11.*) t=hpux11 ;;
                esac ;;
 esac

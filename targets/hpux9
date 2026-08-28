@@ -2,7 +2,7 @@ PLATFORM = hpux
 CXX = g++
 #  HP-UX 9 keeps X11R5 out of the default compiler and linker paths, and its
 #  gcc 2.7 needs the shims in hpux/hpux9.
-CPPFLAGS += -DHPUX9 -Ihpux/hpux9 -I/usr/include/X11R5 -include hpux/hpux9/compat.h
+CPPFLAGS += -DNO_PSS_NBLKSENABLED -Ihpux/hpux9 -I/usr/include/X11R5 -include hpux/hpux9/compat.h
 LDFLAGS += -L/usr/lib/X11R5
 #  The HP-UX 9 linker makes one pass over the archives, so libX11 has to come
 #  round again after libXpm.
