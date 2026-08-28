@@ -1,5 +1,5 @@
 PLATFORM = irix65
-CXX = g++
+CC = gcc
 #  The graphics pipe meter is 6.5 only.
 IRIXGFX =
 #  -isystem /usr/include puts SGI's headers behind gcc's own, and gcc fakes
@@ -17,7 +17,7 @@ IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
 LINK = $(IRIX5_LD) -o $@ -init __gcc_init -fini __gcc_fini \
   /usr/lib/crt1.o $(IRIX5_GCCLIB)/irix-crti.o $(IRIX5_GCCLIB)/crtbegin.o \
   -L$(IRIX5_GCCLIB) -L$(IRIX5_GCCLIB)/../../.. -L/usr/lib $(LDFLAGS) \
-  $^ $(LDLIBS) -lstdc++ -lgcc -lgcc_eh -lc \
+  $^ $(LDLIBS) -lgcc -lgcc_eh -lc \
   $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
 
 #  5.3 has no libXpm; only the pixmapName resource is lost.

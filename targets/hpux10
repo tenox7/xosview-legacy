@@ -1,5 +1,5 @@
 PLATFORM = hpux
-CXX = g++
+CC = gcc
 #  10.20 keeps X11R6 off the default compiler and linker paths and ships no
 #  libXpm; only the pixmapName resource is lost with -DNO_XPM.
 CPPFLAGS += -I/usr/include/X11R6 -I/usr/contrib/X11R6/include -DNO_XPM

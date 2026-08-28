@@ -41,6 +41,7 @@ int xosview_isresourcetrue(XOSView *xv, const char *name);
 const char *xosview_getresource_default(XOSView *xv, const char *name,
                                         const char *defaultVal);
 void xosview_setdone(XOSView *xv, int val);
+void xosview_draw(XOSView *xv);
 void xosview_addmeter(XOSView *xv, Meter *m);
 int xosview_xoff(const XOSView *xv);
 int xosview_newypos(const XOSView *xv);

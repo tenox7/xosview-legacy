@@ -1,6 +1,6 @@
 PLATFORM = aix
 AIXSTATS = perfstat
-CXX = g++
+CC = gcc
 #  installbsd moves its source file unless -c is given, and its -d flag for
 #  creating directories does not exist at all.
 INSTALL = installbsd -c

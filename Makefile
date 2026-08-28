@@ -122,7 +122,10 @@ CPPFLAGS += -Iirix65/
 endif
 
 ifeq ($(PLATFORM), hpux)
-OBJS += hpux/MeterMaker.o \
+#  targets/hpux9 adds its compatibility shim here.
+HPUXCOMPAT ?=
+OBJS += $(HPUXCOMPAT) \
+        hpux/MeterMaker.o \
         hpux/cpumeter.o \
         hpux/loadmeter.o \
         hpux/memmeter.o \

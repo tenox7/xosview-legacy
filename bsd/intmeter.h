@@ -1,37 +1,29 @@
-//
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _INTMETER_H_
 #define _INTMETER_H_
 
 #include "bitmeter.h"
-#include "xosview.h"
-#include <map>
 
+/*  Raw interrupt number to bit index, kept sorted by key.  This stands in
+ *  for the std::map the C++ version used.  */
+typedef struct {
+	int key, index;
+} BsdIntNum;
 
-class IntMeter : public BitMeter {
-public:
-	IntMeter( XOSView *parent, const char *title = "", const char *legend = "",
-	          int dolegends = 0, int dousedlegends = 0 );
-	~IntMeter( void );
+typedef struct {
+	BitMeter b;
+	uint64_t *irqs, *lastirqs;
+	unsigned int *inbrs;
+	unsigned int irqcount;
+	BsdIntNum *nums;
+	int nnums, numcap;
+} IntMeter;
 
-	const char *name( void ) const { return "IntMeter"; }
-	void checkevent( void );
-	void checkResources( void );
-
-private:
-	uint64_t *irqs_, *lastirqs_;
-	unsigned int *inbrs_;
-	unsigned int irqcount_;
-	std::map<int,int> realintnum_;
-
-protected:
-	void getirqs( void );
-	void updateirqcount( bool init = false );
-};
-
+Meter *intmeter_new(XOSView *parent, int dolegends, int dousedlegends);
 
 #endif

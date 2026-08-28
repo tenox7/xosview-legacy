@@ -1,15 +1,17 @@
 PLATFORM = hpux
-CXX = /opt/aCC/bin/aCC
-#  aCC needs -AA for the standard C++ library; the default mode has neither
-#  namespaces nor <iostream>.  It is a link option as well as a compile one.
-OPTFLAGS = -AA +O2
+#  The HP ANSI C compiler, which ships alongside aCC.  The bundled
+#  /usr/bin/cc is K&R only and will not do; set CC = gcc where that is
+#  installed instead.
+CC = /opt/ansic/bin/cc
+#  -Ae is HP cc's ANSI mode with the extensions the system headers want.
+OPTFLAGS = -Ae +O2
 #  X11R6 is off the default linker path and HP-UX ships no libXpm.
-LDFLAGS += -AA -L/usr/lib/X11R6
+LDFLAGS += -L/usr/lib/X11R6
 XPMLIB =
 CPPFLAGS += -DNO_XPM
-#  aCC spells -MMD +Maked, and -Wno-write-strings +W829.
-DEPFLAGS = +Maked
-NOWRITESTRINGS = +W829
+#  HP cc has no -MMD; its +M prints dependencies instead of compiling, so
+#  the build simply does without them.
+DEPFLAGS =
 #  HP-UX has no BSD install(1); the wrapper gives the Makefile the -m it
 #  expects.
 INSTALL = sh hpux/install.sh

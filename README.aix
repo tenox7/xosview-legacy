@@ -31,12 +31,12 @@
   small interface in aix/aixstats.h, which has two implementations; the
   target file picks one by setting AIXSTATS.
 
-  aix/perfstat.cc is the AIX 5.x back end and the default.  It uses
+  aix/perfstat.c is the AIX 5.x back end and the default.  It uses
   libperfstat, which arrived in AIX 5.1 and is the supported interface
   for all of these figures.  It needs no special privileges and its
   counters are 64 bit, so they do not wrap.
 
-  aix/kmem.cc is the AIX 4.x back end, for the releases that predate
+  aix/kmem.c is the AIX 4.x back end, for the releases that predate
   libperfstat.  It reads everything out of /dev/kmem at addresses
   resolved with knlist().  The symbols used are avenrun (load averages),
   sysinfo (cpu ticks, see <sys/sysinfo.h>), vmminfo (paging counters, see

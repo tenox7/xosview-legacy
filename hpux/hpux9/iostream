@@ -1,2 +1,0 @@
-//  libg++ 2.7 has only the pre-standard <iostream.h>.
-#include <iostream.h>

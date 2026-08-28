@@ -16,7 +16,7 @@
     gmake
 
   9.x builds targets/hpux9 (gcc 2.7), 10.x targets/hpux10 (gcc) and 11.x
-  targets/hpux11 (aCC).  Override with "gmake TARGET=hpux9".
+  targets/hpux11 (HP ANSI C).  Override with "gmake TARGET=hpux9".
 
   The build needs GNU make 3.77 or newer.  The 3.75 that HP-UX 9 ships as
   /usr/local/gnu/bin/gmake has neither ?= nor target specific variables and
@@ -25,10 +25,11 @@
   HP-UX 11 notes
   --------------
 
-  The compiler is HP aC++ (/opt/aCC), which needs -AA to compile and link
-  against the standard C++ library; its default mode has neither namespaces
-  nor <iostream>.  It spells -MMD +Maked and -Wno-write-strings +W829, which
-  the target file passes through DEPFLAGS and NOWRITESTRINGS.
+  The compiler is the HP ANSI C compiler at /opt/ansic/bin/cc, which ships
+  alongside aCC; the bundled /usr/bin/cc is K&R only and will not do.  Set
+  CC=gcc where that is installed instead.  -Ae turns on the ANSI mode the
+  system headers want, and HP cc has no -MMD, so the target file clears
+  DEPFLAGS and the build does without header dependencies.
 
   HP-UX ships no libXpm, so the target builds with -DNO_XPM, and it keeps
   X11R6 off the default linker path.
@@ -36,13 +37,11 @@
   HP-UX 9 notes
   -------------
 
-  The newest compiler for 9.x is gcc 2.7 with libg++ 2.7, which is a C++
-  generation behind the other platforms.  hpux/hpux9/compat.h is force
-  included into every translation unit to bridge the gap: it defines std
-  away, since the compiler has no namespaces and the libg++ streams are in
-  the global one, and it declares snprintf, vsnprintf and usleep, which
-  9.x either hides from its headers or does not have at all.
-  hpux/hpux9/iostream maps <iostream> onto the pre-standard <iostream.h>.
+  9.x has libc routines that its headers never declare, and no usleep at
+  all.  hpux/hpux9/compat.h is force included into every translation unit
+  to bridge the gap: it declares snprintf and vsnprintf, and declares a
+  usleep that hpux/hpux9/compat.c supplies as a select(2) on no
+  descriptors.
 
   X11R5 lives in /usr/include/X11R5 and /usr/lib/X11R5 rather than on the
   default search paths, and the linker makes a single pass over archives,

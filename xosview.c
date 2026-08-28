@@ -30,7 +30,7 @@ static void checkMeterResources(XOSView *xv);
 static void figureSize(XOSView *xv);
 static void dolegends(XOSView *xv);
 static void resizeMeters(XOSView *xv);
-static void draw(XOSView *xv);
+void xosview_draw(XOSView *xv);
 static int findx(XOSView *xv);
 static int findy(XOSView *xv);
 static const char *winname(XOSView *xv);
@@ -361,7 +361,7 @@ static void resizeMeters(XOSView *xv) {
   }
 }
 
-static void draw(XOSView *xv) {
+void xosview_draw(XOSView *xv) {
   int i;
 
   if (xv->visibility == WV_OBSCURED) {
@@ -396,7 +396,7 @@ void xosview_run(XOSView *xv) {
 
     /*  redraw everything if needed  */
     if (xv->deferred_redraw) {
-      draw(xv);
+      xosview_draw(xv);
       xv->deferred_redraw = 0;
     }
 

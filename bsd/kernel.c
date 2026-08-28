@@ -1,20 +1,20 @@
-//
-//  NetBSD port:
-//  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
-//
-//  This file was written by Brian Grayson for the NetBSD and xosview
-//    projects.
-//  This file contains code from the NetBSD project, which is covered
-//    by the standard BSD license.
-//  Dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
-//  The OpenBSD interrupt meter code was written by Oleg Safiullin
-//    (form@vs.itam.nsc.ru).
-//  This file may be distributed under terms of the GPL or of the BSD
-//    license, whichever you choose.  The full license notices are
-//    contained in the files COPYING.GPL and COPYING.BSD, which you
-//    should have received.  If not, contact one of the xosview
-//    authors for a copy.
-//
+/*
+ *  NetBSD port:
+ *  Copyright (c) 1995, 1996, 1997-2002 by Brian Grayson (bgrayson@netbsd.org)
+ *
+ *  This file was written by Brian Grayson for the NetBSD and xosview
+ *    projects.
+ *  This file contains code from the NetBSD project, which is covered
+ *    by the standard BSD license.
+ *  Dummy device ignore code by : David Cuka (dcuka@intgp1.ih.att.com)
+ *  The OpenBSD interrupt meter code was written by Oleg Safiullin
+ *    (form@vs.itam.nsc.ru).
+ *  This file may be distributed under terms of the GPL or of the BSD
+ *    license, whichever you choose.  The full license notices are
+ *    contained in the files COPYING.GPL and COPYING.BSD, which you
+ *    should have received.  If not, contact one of the xosview
+ *    authors for a copy.
+ */
 
 #include "kernel.h"
 
@@ -104,16 +104,16 @@ static int mib_uvm[2] = { CTL_VM, VM_UVMEXP };
 #endif
 
 
-// ------------------------  local variables  ----------------------------------
+/* ------------------------  local variables  ---------------------------------- */
 
-//  This single kvm_t is shared by all of the kvm routines.
+/*  This single kvm_t is shared by all of the kvm routines. */
 kvm_t* kd = NULL;
 
-//  This struct has the list of all the symbols we want from the kernel.
+/*  This struct has the list of all the symbols we want from the kernel. */
 static struct nlist nlst[] =
 {
-// We put a dummy symbol for a don't care, and ignore warnings about
-// this later on.  This keeps the indices within the nlist constant.
+/* We put a dummy symbol for a don't care, and ignore warnings about */
+/* this later on.  This keeps the indices within the nlist constant. */
 #define DUMMY_SYM "dummy_sym"
 
 #if defined(XOSVIEW_OPENBSD)
@@ -158,10 +158,10 @@ static struct nlist nlst[] =
 static char kernelFileName[_POSIX2_LINE_MAX];
 
 
-// ------------------------  utility functions  --------------------------------
-//  The following is an error-checking form of kvm_read.  In addition
-//  it uses kd as the implicit kernel-file to read.  Saves typing.
-//  Since this is C++, it's an inline function rather than a macro.
+/* ------------------------  utility functions  -------------------------------- */
+/*  The following is an error-checking form of kvm_read.  In addition */
+/*  it uses kd as the implicit kernel-file to read.  Saves typing. */
+/*  Since this is C++, it's an inline function rather than a macro. */
 
 static inline void
 safe_kvm_read(unsigned long kernel_addr, void* user_addr, size_t nbytes) {
@@ -177,8 +177,8 @@ safe_kvm_read(unsigned long kernel_addr, void* user_addr, size_t nbytes) {
 		warn("safe_kvm_read(%#lx) returned %d bytes, not %d", kernel_addr, retval, (int)nbytes);
 }
 
-//  This version uses the symbol offset in the nlst variable, to make it
-//  a little more convenient.  BCG
+/*  This version uses the symbol offset in the nlst variable, to make it */
+/*  a little more convenient.  BCG */
 static inline void
 safe_kvm_read_symbol(int nlstOffset, void* user_addr, size_t nbytes) {
 	safe_kvm_read(nlst[nlstOffset].n_value, user_addr, nbytes);
@@ -195,7 +195,7 @@ SymbolValue(int index) {
 }
 
 void
-BSDInit() {
+BSDInit(void) {
 	kernelFileName[0] = '\0';
 }
 
@@ -208,11 +208,11 @@ SetKernelName(const char* kernelName) {
 }
 
 void
-OpenKDIfNeeded() {
+OpenKDIfNeeded(void) {
 	char errstring[_POSIX2_LINE_MAX];
 
 	if (kd)
-		return; //  kd is non-NULL, so it has been initialized.  BCG
+		return; /*  kd is non-NULL, so it has been initialized.  BCG */
 
 	/*  Open it read-only, for a little added safety.  */
 	/*  If the first character of kernelFileName is not '\0', then use
@@ -224,17 +224,17 @@ OpenKDIfNeeded() {
 		return;
 	}
 
-	// Parenthetical note:  FreeBSD kvm_openfiles() uses getbootfile() to get
-	// the correct kernel file if the 1st arg is NULL.  As far as I can see,
-	// one should always use NULL in FreeBSD, but I suppose control is never a
-	// bad thing... (pavel 21-Jan-1998)
+	/* Parenthetical note:  FreeBSD kvm_openfiles() uses getbootfile() to get */
+	/* the correct kernel file if the 1st arg is NULL.  As far as I can see, */
+	/* one should always use NULL in FreeBSD, but I suppose control is never a */
+	/* bad thing... (pavel 21-Jan-1998) */
 
 	/*  Now grab the symbol offsets for the symbols that we want.  */
 	if (kvm_nlist(kd, nlst) < 0)
 		err(EX_OSERR, "Could not get kvm symbols");
 
-	//  Look at all of the returned symbols, and check for bad lookups.
-	//  (This may be unnecessary, but better to check than not to...  )
+	/*  Look at all of the returned symbols, and check for bad lookups. */
+	/*  (This may be unnecessary, but better to check than not to...  ) */
 	struct nlist *nlp = nlst;
 	while (nlp && nlp->n_name) {
 		if ( strncmp(nlp->n_name, DUMMY_SYM, strlen(DUMMY_SYM))) {
@@ -251,7 +251,7 @@ OpenKDIfNeeded() {
 }
 
 int
-BSDGetCPUSpeed() {
+BSDGetCPUSpeed(void) {
 	size_t size;
 	int cpu_speed = 0;
 
@@ -262,7 +262,7 @@ BSDGetCPUSpeed() {
 	for (int i = 0; i < cpus; i++) {
 		snprintf(name, 25, "dev.cpu.%d.freq", i);
 		if ( sysctlbyname(name, &speed, &size, NULL, 0) == 0 ) {
-			// count only cpus with individual freq available
+			/* count only cpus with individual freq available */
 			cpu_speed += speed;
 			avail_cpus++;
 		}
@@ -289,9 +289,9 @@ BSDGetCPUSpeed() {
 }
 
 
-// --------------------  PageMeter & MemMeter functions  -----------------------
+/* --------------------  PageMeter & MemMeter functions  ----------------------- */
 void
-BSDPageInit() {
+BSDPageInit(void) {
 	OpenKDIfNeeded();
 }
 
@@ -310,13 +310,13 @@ BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 		err(EX_OSERR, "sysctl vm.uvmexp failed");
 
 	if (meminfo) {
-		// UVM excludes kernel memory -> assume it is active mem
+		/* UVM excludes kernel memory -> assume it is active mem */
 		meminfo[0] = (uint64_t)(uvm.npages - uvm.inactive - uvm.wired - uvm.free) * uvm.pagesize;
 		meminfo[1] = (uint64_t)uvm.inactive * uvm.pagesize;
 		meminfo[2] = (uint64_t)uvm.wired * uvm.pagesize;
 
-		// cache is already included in active and inactive memory and
-		// there's no way to know how much is in which -> disable cache
+		/* cache is already included in active and inactive memory and */
+		/* there's no way to know how much is in which -> disable cache */
 		meminfo[3] = 0;
 		meminfo[4] = (uint64_t)uvm.free * uvm.pagesize;
 	}
@@ -388,10 +388,10 @@ BSDGetPageStats(uint64_t *meminfo, uint64_t *pageinfo) {
 }
 
 
-// ------------------------  CPUMeter functions  -------------------------------
+/* ------------------------  CPUMeter functions  ------------------------------- */
 
 void
-BSDCPUInit() {
+BSDCPUInit(void) {
 	OpenKDIfNeeded();
 #if defined(XOSVIEW_FREEBSD)
 	size_t size = sizeof(maxcpus);
@@ -405,11 +405,11 @@ BSDCPUInit() {
 
 void
 BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
-	// timeArray is CPUSTATES long.
-	// cpu is the number of CPU to return, starting from 1. If cpu == 0,
-	// return aggregate times for all CPUs.
-	// All BSDs have separate calls for aggregate and separate times. Only
-	// OpenBSD returns one CPU per call, others return all at once.
+	/* timeArray is CPUSTATES long. */
+	/* cpu is the number of CPU to return, starting from 1. If cpu == 0, */
+	/* return aggregate times for all CPUs. */
+	/* All BSDs have separate calls for aggregate and separate times. Only */
+	/* OpenBSD returns one CPU per call, others return all at once. */
 	if (!timeArray)
 		err(EX_SOFTWARE, "BSDGetCPUTimes(): passed pointer was null.");
 	size_t size;
@@ -422,11 +422,11 @@ BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
 #elif defined(XOSVIEW_FREEBSD)
 	size = CPUSTATES * sizeof(long);
 	long *times = (long*)calloc(maxcpus + 1, size);
-#else // XOSVIEW_OPENBSD
+#else /* XOSVIEW_OPENBSD */
 	uint64_t *times = (uint64_t*)calloc(CPUSTATES, sizeof(uint64_t));
 #endif
-	// this array will have aggregate values at 0, then each CPU (except on
-	// OpenBSD), so that cpu can be used as index
+	/* this array will have aggregate values at 0, then each CPU (except on */
+	/* OpenBSD), so that cpu can be used as index */
 	if (!times)
 		err(EX_OSERR, "BSDGetCPUTimes(): malloc failed");
 
@@ -445,17 +445,17 @@ BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
 	timeArray[2] = times[cpu].cp_sys;
 	timeArray[3] = times[cpu].cp_intr;
 	timeArray[4] = times[cpu].cp_idle;
-#else  // !XOSVIEW_DFBSD
+#else  /* !XOSVIEW_DFBSD */
 	size = CPUSTATES * sizeof(times[0]);
-	if (cpu == 0) {  // aggregate times
+	if (cpu == 0) {  /* aggregate times */
 #if defined(XOSVIEW_FREEBSD)
 		if ( sysctlbyname("kern.cp_time", times, &size, NULL, 0) < 0 )
-#else  // XOSVIEW_NETBSD || XOSVIEW_OPENBSD
+#else  /* XOSVIEW_NETBSD || XOSVIEW_OPENBSD */
 		if ( sysctl(mib_cpt, 2, times, &size, NULL, 0) < 0 )
 #endif
 			err(EX_OSERR, "sysctl kern.cp_time failed");
 	}
-	else {  // separate times
+	else {  /* separate times */
 #if defined(XOSVIEW_FREEBSD)
 		size *= maxcpus;
 		if ( sysctlbyname("kern.cp_times", times + CPUSTATES, &size, NULL, 0) < 0 )
@@ -464,16 +464,16 @@ BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
 		size *= BSDCountCpus();
 		if ( sysctl(mib_cpt, 2, times + CPUSTATES, &size, NULL, 0) < 0 )
 			err(EX_OSERR, "sysctl kern.cp_time failed");
-#else  // XOSVIEW_OPENBSD
+#else  /* XOSVIEW_OPENBSD */
 		mib_cpt2[2] = cpu - 1;
 		if ( sysctl(mib_cpt2, 3, times, &size, NULL, 0) < 0 )
 			err(EX_OSERR, "sysctl kern.cp_time2 failed");
 #endif
 	}
 	for (int i = 0; i < CPUSTATES; i++)
-#if defined(XOSVIEW_OPENBSD) // aggregates are long, singles uint64_t
+#if defined(XOSVIEW_OPENBSD) /* aggregates are long, singles uint64_t */
 		timeArray[i] = ( cpu ? times[i] : ((long*)(times))[i] );
-#else  // XOSVIEW_FREEBSD || XOSVIEW_NETBSD
+#else  /* XOSVIEW_FREEBSD || XOSVIEW_NETBSD */
 		timeArray[i] = times[cpu * CPUSTATES + i];
 #endif
 #endif
@@ -481,15 +481,15 @@ BSDGetCPUTimes(uint64_t *timeArray, unsigned int cpu) {
 }
 
 
-// ------------------------  NetMeter functions  -------------------------------
+/* ------------------------  NetMeter functions  ------------------------------- */
 int
-BSDNetInit() {
+BSDNetInit(void) {
 	OpenKDIfNeeded();
 	return 1;
 }
 
 void
-BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool ignored) {
+BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, int ignored) {
 	struct ifaddrs *ifap, *ifa;
 	*inbytes = 0;
 	*outbytes = 0;
@@ -498,7 +498,7 @@ BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool
 		return;
 
 	for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-		bool skipif = false;
+		int skipif = 0;
 
 		if (ifa->ifa_addr->sa_family != AF_LINK)
 			continue;
@@ -506,7 +506,7 @@ BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool
 		if ( strncmp(netIface, "False", 5) != 0 ) {
 			if ( (!ignored && strncmp(ifa->ifa_name, netIface, 256) != 0) ||
 			     ( ignored && strncmp(ifa->ifa_name, netIface, 256) == 0) )
-				skipif = true;
+				skipif = 1;
 		}
 #define	IFA_STAT(s)	(((struct if_data *)ifa->ifa_data)->ifi_ ## s)
 		if (!skipif) {
@@ -519,10 +519,10 @@ BSDGetNetInOut(uint64_t *inbytes, uint64_t *outbytes, const char *netIface, bool
 }
 
 
-//  ---------------------- Swap Meter stuff  -----------------------------------
+/*  ---------------------- Swap Meter stuff  ----------------------------------- */
 
 int
-BSDSwapInit() {
+BSDSwapInit(void) {
 	OpenKDIfNeeded();
 	return 1;
 }
@@ -530,13 +530,13 @@ BSDSwapInit() {
 void
 BSDGetSwapInfo(uint64_t *total, uint64_t *used) {
 #if defined(HAVE_SWAPCTL)
-	//  This code is based on a patch sent in by Scott Stevens
-	//  (s.k.stevens@ic.ac.uk, at the time).
+	/*  This code is based on a patch sent in by Scott Stevens */
+	/*  (s.k.stevens@ic.ac.uk, at the time). */
 	struct swapent *sep, *swapiter;
 	int bsize, rnswap, nswap = swapctl(SWAP_NSWAP, 0, 0);
 	*total = *used = 0;
 
-	if (nswap < 1)  // no swap devices on
+	if (nswap < 1)  /* no swap devices on */
 		return;
 
 	if ( (sep = (struct swapent *)malloc(nswap* sizeof(struct swapent))) == NULL )
@@ -549,7 +549,7 @@ BSDGetSwapInfo(uint64_t *total, uint64_t *used) {
 		      "(nswap=%d versus rnswap=%d).", nswap, rnswap);
 
 	swapiter = sep;
-	bsize = 512;  // block size is that of underlying device, *usually* 512 bytes
+	bsize = 512;  /* block size is that of underlying device, *usually* 512 bytes */
 	for ( ; rnswap-- > 0; swapiter++) {
 		*total += (uint64_t)swapiter->se_nblks * bsize;
 		*used += (uint64_t)swapiter->se_inuse * bsize;
@@ -568,7 +568,7 @@ BSDGetSwapInfo(uint64_t *total, uint64_t *used) {
 }
 
 
-// ----------------------- Disk Meter stuff  -----------------------------------
+/* ----------------------- Disk Meter stuff  ----------------------------------- */
 
 #ifdef HAVE_DEVSTAT
 /*
@@ -792,7 +792,7 @@ DevStat_Get(uint64_t *read_bytes, uint64_t *write_bytes) {
 #endif
 
 int
-BSDDiskInit() {
+BSDDiskInit(void) {
 	OpenKDIfNeeded();
 #if defined(HAVE_DEVSTAT)
 	DevStat_Init();
@@ -808,18 +808,18 @@ BSDGetDiskXFerBytes(uint64_t *read_bytes, uint64_t *write_bytes) {
 	*read_bytes = *write_bytes = 0;
 # if defined(XOSVIEW_NETBSD)
 	size_t size;
-	// Do a sysctl with a NULL data pointer to get the size that would
-	// have been returned, and use that to figure out # drives.
+	/* Do a sysctl with a NULL data pointer to get the size that would */
+	/* have been returned, and use that to figure out # drives. */
 	if ( sysctl(mib_dsk, 3, NULL, &size, NULL, 0) < 0 )
 		err(EX_OSERR, "BSDGetDiskXFerBytes(): sysctl hw.iostats #1 failed");
 	unsigned int ndrives = size / mib_dsk[2];
 	struct io_sysctl drive_stats[ndrives];
 
-	// Get the stats.
+	/* Get the stats. */
 	if ( sysctl(mib_dsk, 3, drive_stats, &size, NULL, 0) < 0 )
 		err(EX_OSERR, "BSDGetDiskXFerBytes(): sysctl hw.iostats #2 failed");
 
-	// Now accumulate the total.
+	/* Now accumulate the total. */
 	for (uint i = 0; i < ndrives; i++) {
 		*read_bytes += drive_stats[i].rbytes;
 		*write_bytes += drive_stats[i].wbytes;
@@ -849,12 +849,12 @@ BSDGetDiskXFerBytes(uint64_t *read_bytes, uint64_t *write_bytes) {
 }
 
 
-//  ---------------------- Interrupt Meter stuff  ------------------------------
+/*  ---------------------- Interrupt Meter stuff  ------------------------------ */
 
 int
-BSDIntrInit() {
+BSDIntrInit(void) {
 	OpenKDIfNeeded();
-	// Make sure the intr counter array is nonzero in size.
+	/* Make sure the intr counter array is nonzero in size. */
 #if defined(XOSVIEW_FREEBSD)
 # if __FreeBSD_version >= 900040
 	size_t nintr;
@@ -870,7 +870,7 @@ BSDIntrInit() {
 }
 
 int
-BSDNumInts() {
+BSDNumInts(void) {
 	/* This code is stolen from vmstat. */
 	int count = 0, nbr = 0;
 #if defined(XOSVIEW_FREEBSD)
@@ -938,7 +938,7 @@ BSDNumInts() {
 			if ( nbr > count )
 				count = nbr;
 	}
-#else  // XOSVIEW_DFBSD
+#else  /* XOSVIEW_DFBSD */
 	int nintr = 0;
 	size_t inamlen;
 	char *intrnames, *intrs;
@@ -957,19 +957,19 @@ BSDNumInts() {
 		return 0;
 	}
 	for (uint i = 0; i < inamlen; i++) {
-		if (intrs[i] == '\0')  // count end-of-strings
+		if (intrs[i] == '\0')  /* count end-of-strings */
 			nintr++;
 	}
 	for (int i = 0; i < nintr; i++) {
 		if ( sscanf(intrnames, "irq%d", &nbr) == 0 ) {
-			if ( ++nbr > count )  // unused ints are named irqn where
-				count = nbr;      // 0<=n<=255, used ones have device name
+			if ( ++nbr > count )  /* unused ints are named irqn where */
+				count = nbr;      /* 0<=n<=255, used ones have device name */
 		}
 		intrnames += strlen(intrnames) + 1;
 	}
 	free(intrs);
 #endif
-	return count;  // this is the highest numbered interrupt
+	return count;  /* this is the highest numbered interrupt */
 }
 
 void
@@ -996,7 +996,7 @@ BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs) {
 	     ((kvm_intrnames = (char *)malloc(inamlen)) == NULL) )
 		err(EX_OSERR, "BSDGetIntrStats(): malloc failed");
 
-	// keep track of the mem we're given:
+	/* keep track of the mem we're given: */
 	intrcnt = kvm_intrcnt;
 	intrnames = kvm_intrnames;
 
@@ -1056,18 +1056,18 @@ BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs) {
 		mib_int[3] = i;
 		size = sizeof(nbr);
 		if ( sysctl(mib_int, 4, &nbr, &size, NULL, 0) < 0 )
-			continue;  // not active
+			continue;  /* not active */
 		mib_int[2] = KERN_INTRCNT_CNT;
 		size = sizeof(count);
 		if ( sysctl(mib_int, 4, &count, &size, NULL, 0) < 0 ) {
 			warn("sysctl kern.intrcnt.cnt.%d failed", i);
 			count = 0;
 		}
-		intrCount[nbr] += count;  // += because ints can share number
+		intrCount[nbr] += count;  /* += because ints can share number */
 		if (intrNbrs)
 			intrNbrs[nbr] = 1;
 	}
-#else  // XOSVIEW_DFBSD
+#else  /* XOSVIEW_DFBSD */
 	int nintr = 0;
 	size_t inamlen;
 	unsigned long *intrcnt;
@@ -1087,7 +1087,7 @@ BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs) {
 		return;
 	}
 	for (uint i = 0; i < inamlen; i++) {
-		if (intrs[i] == '\0')  // count end-of-strings
+		if (intrs[i] == '\0')  /* count end-of-strings */
 			nintr++;
 	}
 	if ( !(intrnames = (char **)malloc(nintr * sizeof(char *))) )
@@ -1119,7 +1119,7 @@ BSDGetIntrStats(uint64_t *intrCount, unsigned int *intrNbrs) {
 }
 
 
-//  ---------------------- Sensor Meter stuff  ---------------------------------
+/*  ---------------------- Sensor Meter stuff  --------------------------------- */
 
 static int mib_cpu[2] = { CTL_HW, HW_NCPU };
 
@@ -1137,10 +1137,10 @@ unsigned int
 BSDGetCPUTemperature(float *temps, float *tjmax) {
 	unsigned int nbr = 0;
 #if defined(XOSVIEW_NETBSD)
-	// All kinds of sensors are read with libprop. We have to go through them
-	// to find either Intel Core 2 or AMD ones. Actual temperature is in
-	// cur-value and TjMax, if present, in critical-max.
-	// Values are in microdegrees Kelvin.
+	/* All kinds of sensors are read with libprop. We have to go through them */
+	/* to find either Intel Core 2 or AMD ones. Actual temperature is in */
+	/* cur-value and TjMax, if present, in critical-max. */
+	/* Values are in microdegrees Kelvin. */
 	int fd;
 	const char *name = NULL;
 	char dummy[20];
@@ -1151,7 +1151,7 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 
 	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 ) {
 		warn("Could not open %s", _PATH_SYSMON);
-		return 0;  // this seems to happen occasionally, so only warn
+		return 0;  /* this seems to happen occasionally, so only warn */
 	}
 	if (prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict))
 		err(EX_OSERR, "Could not get sensor dictionary");
@@ -1197,34 +1197,34 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 	size_t size = sizeof(val);
 
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
-	// All kinds of sensors are read with sysctl. We have to go through them
-	// to find either Intel Core 2 or AMD ones.
-	// Values are in microdegrees Kelvin.
+	/* All kinds of sensors are read with sysctl. We have to go through them */
+	/* to find either Intel Core 2 or AMD ones. */
+	/* Values are in microdegrees Kelvin. */
 	struct sensordev sd;
 	struct sensor s;
 	int cpu = 0;
 	char dummy[10];
 
-	for (int dev = 0; dev < 1024; dev++) {  // go through all sensor devices
+	for (int dev = 0; dev < 1024; dev++) {  /* go through all sensor devices */
 		mib_sen[2] = dev;
 		size = sizeof(sd);
 		if ( sysctl(mib_sen, 3, &sd, &size, NULL, 0) < 0 ) {
 			if (errno == ENOENT)
-				break;  // no more sensors
+				break;  /* no more sensors */
 			if (errno == ENXIO)
-				continue;  // no sensor with this mib
+				continue;  /* no sensor with this mib */
 			err(EX_OSERR, "sysctl hw.sensors.%d failed", dev);
 		}
 		if ( strncmp(sd.xname, "cpu", 3) )
-			continue;  // not CPU sensor
+			continue;  /* not CPU sensor */
 		sscanf(sd.xname, "%[^0-9]%d", dummy, &cpu);
 
-		mib_sen[3] = SENSOR_TEMP;  // for each device, get temperature sensors
+		mib_sen[3] = SENSOR_TEMP;  /* for each device, get temperature sensors */
 		for (int i = 0; i < sd.maxnumt[SENSOR_TEMP]; i++) {
 			mib_sen[4] = i;
 			size = sizeof(s);
 			if ( sysctl(mib_sen, 5, &s, &size, NULL, 0) < 0 )
-				continue;  // no sensor on this core?
+				continue;  /* no sensor on this core? */
 			if (s.flags & SENSOR_FINVALID)
 				continue;
 			if (temps)
@@ -1233,10 +1233,10 @@ BSDGetCPUTemperature(float *temps, float *tjmax) {
 		}
 	}
 #else  /* XOSVIEW_FREEBSD */
-	// Temperatures can be read with sysctl dev.cpu.%d.temperature on both
-	// Intel Core 2 and AMD K8+ processors.
-	// Values are in degrees Celsius (FreeBSD < 7.2) or in
-	// 10*degrees Kelvin (FreeBSD >= 7.3).
+	/* Temperatures can be read with sysctl dev.cpu.%d.temperature on both */
+	/* Intel Core 2 and AMD K8+ processors. */
+	/* Values are in degrees Celsius (FreeBSD < 7.2) or in */
+	/* 10*degrees Kelvin (FreeBSD >= 7.3). */
 	char name[25];
 	int cpus = BSDCountCpus();
 	for (int i = 0; i < cpus; i++) {
@@ -1277,8 +1277,8 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 		errx(EX_SOFTWARE, "NULL pointer passed to BSDGetSensor().");
 #if defined(XOSVIEW_NETBSD)
 	/* Adapted from envstat. */
-	// All kinds of sensors are read with libprop. Specific device and value
-	// can be asked for. Values are transformed to suitable units.
+	/* All kinds of sensors are read with libprop. Specific device and value */
+	/* can be asked for. Values are transformed to suitable units. */
 	int fd, val = 0;
 	char type[20];
 	prop_dictionary_t pdict;
@@ -1287,7 +1287,7 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 
 	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 ) {
 		warn("Could not open %s", _PATH_SYSMON);
-		return;  // this seems to happen occasionally, so only warn
+		return;  /* this seems to happen occasionally, so only warn */
 	}
 	if (prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict))
 		err(EX_OSERR, "Could not get sensor dictionary");
@@ -1312,50 +1312,50 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 		if ( strncmp(type, "Indicator", 3) == 0 ||
 		     strncmp(type, "Battery", 3) == 0   ||
 		     strncmp(type, "Drive", 3) == 0 )
-			continue;  // these are string values
+			continue;  /* these are string values */
 		if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, valname)) )
 			val = prop_number_integer_value((prop_number_t)pobj1);
 		else
 			err(EX_USAGE, "Value %s does not exist", valname);
 		if ( strncmp(type, "Temperature", 4) == 0 ) {
-			*value = (val / 1000000.0) - 273.15;  // temperatures are in microkelvins
+			*value = (val / 1000000.0) - 273.15;  /* temperatures are in microkelvins */
 			if (unit)
 				strcpy(unit, "\260C");
 		}
 		else if ( strncmp(type, "Fan", 3) == 0 ) {
-			*value = (float)val;                  // plain integer value
+			*value = (float)val;                  /* plain integer value */
 			if (unit)
 				strcpy(unit, "RPM");
 		}
 		else if ( strncmp(type, "Integer", 3) == 0 )
-			*value = (float)val;                  // plain integer value
+			*value = (float)val;                  /* plain integer value */
 		else if ( strncmp(type, "Voltage", 4) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "V");
 		}
 		else if ( strncmp(type, "Ampere hour", 7) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "Ah");
 		}
 		else if ( strncmp(type, "Ampere", 7) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "A");
 		}
 		else if ( strncmp(type, "Watt hour", 5) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "Wh");
 		}
 		else if ( strncmp(type, "Watts", 5) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "W");
 		}
 		else if ( strncmp(type, "Ohms", 4) == 0 ) {
-			*value = (float)val / 1000000.0;      // electrical units are in micro{V,A,W,Ohm}
+			*value = (float)val / 1000000.0;      /* electrical units are in micro{V,A,W,Ohm} */
 			if (unit)
 				strcpy(unit, "Ohm");
 		}
@@ -1366,9 +1366,9 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 	size_t size;
 	char dummy[50];
 #if defined(XOSVIEW_FREEBSD) || defined(XOSVIEW_DFBSD)
-	// FreeBSD has no sensor framework, but ACPI thermal zones might work.
-	// They are readable through sysctl (also works in Dragonfly).
-	// Values are in 10 * degrees Kelvin.
+	/* FreeBSD has no sensor framework, but ACPI thermal zones might work. */
+	/* They are readable through sysctl (also works in Dragonfly). */
+	/* Values are in 10 * degrees Kelvin. */
 	if ( strncmp(name, "tz", 2) == 0 ) {
 		int val = 0;
 		size = sizeof(val);
@@ -1380,34 +1380,34 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 			strcpy(unit, "\260C");
 		return;
 	}
-	// If Dragonfly and tzN specified, return. Otherwise, fall through.
+	/* If Dragonfly and tzN specified, return. Otherwise, fall through. */
 #endif
 #if defined(XOSVIEW_OPENBSD) || defined(XOSVIEW_DFBSD)
 	/* Adapted from systat. */
-	// All kinds of sensors are read with sysctl. We have to go through them
-	// to find the required device and value. Parameter 'name' is the device
-	// name and 'valname' consists of type and sensor index (e.g. it0.temp1).
-	//  Values are transformed to suitable units.
+	/* All kinds of sensors are read with sysctl. We have to go through them */
+	/* to find the required device and value. Parameter 'name' is the device */
+	/* name and 'valname' consists of type and sensor index (e.g. it0.temp1). */
+	/*  Values are transformed to suitable units. */
 	int index = -1;
 	struct sensordev sd;
 	struct sensor s;
 
-	for (int dev = 0; dev < 1024; dev++) {  // go through all sensor devices
+	for (int dev = 0; dev < 1024; dev++) {  /* go through all sensor devices */
 		mib_sen[2] = dev;
 		size = sizeof(sd);
 		if ( sysctl(mib_sen, 3, &sd, &size, NULL, 0) < 0 ) {
 			if (errno == ENOENT)
-				break;  // no more devices
+				break;  /* no more devices */
 			if (errno == ENXIO)
-				continue;  // no device with this mib
+				continue;  /* no device with this mib */
 			err(EX_OSERR, "sysctl hw.sensors.%d failed", dev);
 		}
 		if ( strncmp(sd.xname, name, sizeof(name)) )
-			continue;  // sensor name does not match
+			continue;  /* sensor name does not match */
 
 		for (int t = 0; t < SENSOR_MAX_TYPES; t++) {
 			if ( strncmp(sensor_type_s[t], valname, strlen(sensor_type_s[t])) )
-				continue;  // wrong type
+				continue;  /* wrong type */
 			mib_sen[3] = t;
 			sscanf(valname, "%[^0-9]%d", dummy, &index);
 			if (index < sd.maxnumt[t]) {
@@ -1416,7 +1416,7 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 				if ( sysctl(mib_sen, 5, &s, &size, NULL, 0) < 0 ) {
 					if (errno != ENOENT)
 						err(EX_OSERR, "sysctl hw.sensors.%d.%d.%d failed", dev, t, index);
-					continue;  // no more sensors
+					continue;  /* no more sensors */
 				}
 				if (s.flags & SENSOR_FINVALID)
 					continue;
@@ -1507,7 +1507,7 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 				case SENSOR_ACCEL:
 					*value = (float)s.value / 1000000.0;
 					if (unit)
-						strcpy(unit, "m\\/s\262"); // m/s²
+						strcpy(unit, "m\\/s\262"); /* m/s² */
 					break;
 #endif
 #endif
@@ -1526,55 +1526,55 @@ BSDGetSensor(const char *name, const char *valname, float *value, char *unit) {
 }
 
 
-//  ---------------------- Battery Meter stuff ---------------------------------
+/*  ---------------------- Battery Meter stuff --------------------------------- */
 
-bool
-BSDHasBattery() {
+int
+BSDHasBattery(void) {
 #if defined(XOSVIEW_NETBSD)
 	int fd;
 	prop_dictionary_t pdict;
 	prop_object_t pobj;
 
 	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 )
-		return false;
+		return 0;
 	if ( prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict) )
 		err(EX_OSERR, "Could not get sensor dictionary");
 	if ( close(fd) == -1 )
 		err(EX_OSERR, "Could not close %s", _PATH_SYSMON);
 
 	if ( prop_dictionary_count(pdict) == 0 )
-		return false;
-	pobj = prop_dictionary_get(pdict, "acpibat0"); // just check for 1st battery
+		return 0;
+	pobj = prop_dictionary_get(pdict, "acpibat0"); /* just check for 1st battery */
 	if ( prop_object_type(pobj) != PROP_TYPE_ARRAY )
-		return false;
-	return true;
+		return 0;
+	return 1;
 #elif defined(XOSVIEW_OPENBSD)
-	// check if we can get full capacity of the 1st battery
+	/* check if we can get full capacity of the 1st battery */
 	float val = -1.0;
-	BSDGetSensor("acpibat0", "amphour0", &val);
+	BSDGetSensor("acpibat0", "amphour0", &val, NULL);
 	if (val < 0)
-		return false;
-	return true;
-#else // XOSVIEW_FREEBSD || XOSVIEW_DFBSD
+		return 0;
+	return 1;
+#else /* XOSVIEW_FREEBSD || XOSVIEW_DFBSD */
 	int fd;
 	if ( (fd = open(ACPIDEV, O_RDONLY)) == -1 ) {
-		// No ACPI -> try APM
+		/* No ACPI -> try APM */
 		if ( (fd = open(APMDEV, O_RDONLY)) == -1 )
-			return false;
+			return 0;
 		struct apm_info aip;
 		if ( ioctl(fd, APMIO_GETINFO, &aip) == -1 )
-			return false;
+			return 0;
 		if ( close(fd) == -1 )
 			err(EX_OSERR, "Could not close %s", APMDEV);
 		if (aip.ai_batt_stat == 0xff || aip.ai_batt_life == 0xff)
-			return false;
-		return true;
+			return 0;
+		return 1;
 	}
 
 	union acpi_battery_ioctl_arg battio;
 	battio.unit = ACPI_BATTERY_ALL_UNITS;
 	if ( ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) == -1 )
-		return false;
+		return 0;
 	if ( close(fd) == -1 )
 		err(EX_OSERR, "Could not close %s", ACPIDEV);
 	return ( battio.battinfo.state != ACPI_BATT_STAT_NOT_PRESENT );
@@ -1588,11 +1588,11 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 	int batteries = 0;
 #if defined(XOSVIEW_NETBSD)
 	/* Again adapted from envstat. */
-	// All kinds of sensors are read with libprop. We have to go through them
-	// to find the batteries. We need capacity, charge, presence, charging
-	// status and discharge rate for each battery for the calculations.
-	// For simplicity, assume all batteries have the same
-	// charge/discharge status.
+	/* All kinds of sensors are read with libprop. We have to go through them */
+	/* to find the batteries. We need capacity, charge, presence, charging */
+	/* status and discharge rate for each battery for the calculations. */
+	/* For simplicity, assume all batteries have the same */
+	/* charge/discharge status. */
 	int fd;
 	int total_capacity = 0, total_charge = 0, total_low = 0, total_crit = 0;
 	const char *name = NULL;
@@ -1603,7 +1603,7 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 
 	if ( (fd = open(_PATH_SYSMON, O_RDONLY)) == -1 ) {
 		warn("Could not open %s", _PATH_SYSMON);
-		return;  // this seems to happen occasionally, so only warn
+		return;  /* this seems to happen occasionally, so only warn */
 	}
 	if ( prop_dictionary_recv_ioctl(fd, ENVSYS_GETDICTIONARY, &pdict) )
 		err(EX_OSERR, "Could not get sensor dictionary");
@@ -1633,19 +1633,19 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 				continue;
 			if ( prop_string_equals_cstring((prop_string_t)pobj1, "invalid") ||
 			     prop_string_equals_cstring((prop_string_t)pobj1, "unknown") )
-				continue; // skip sensors without valid data
+				continue; /* skip sensors without valid data */
 			if ( !(pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "description")) )
 				continue;
 			name = prop_string_cstring_nocopy((prop_string_t)pobj1);
-			if ( strncmp(name, "present", 7) == 0 ) { // is battery present
+			if ( strncmp(name, "present", 7) == 0 ) { /* is battery present */
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
 					present = prop_number_integer_value((prop_number_t)pobj1);
 			}
-			else if ( strncmp(name, "design cap", 10) == 0 ) { // get full capacity
+			else if ( strncmp(name, "design cap", 10) == 0 ) { /* get full capacity */
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
 					capacity = prop_number_integer_value((prop_number_t)pobj1);
 			}
-			else if ( strncmp(name, "charge", 7) == 0 ) { // get present charge, low and critical levels
+			else if ( strncmp(name, "charge", 7) == 0 ) { /* get present charge, low and critical levels */
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
 					charge = prop_number_integer_value((prop_number_t)pobj1);
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "warning-capacity")) )
@@ -1653,12 +1653,12 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "critical-capacity")) )
 					crit = prop_number_integer_value((prop_number_t)pobj1);
 			}
-			else if ( strncmp(name, "charging", 8) == 0 ) { // charging or not?
+			else if ( strncmp(name, "charging", 8) == 0 ) { /* charging or not? */
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
 					if ( prop_number_integer_value((prop_number_t)pobj1) )
 						*state |= XOSVIEW_BATT_CHARGING;
 			}
-			else if ( strncmp(name, "discharge rate", 14) == 0 ) { // discharging or not?
+			else if ( strncmp(name, "discharge rate", 14) == 0 ) { /* discharging or not? */
 				if ( (pobj1 = prop_dictionary_get((prop_dictionary_t)pobj, "cur-value")) )
 					if ( prop_number_integer_value((prop_number_t)pobj1) )
 						*state |= XOSVIEW_BATT_DISCHARGING;
@@ -1675,32 +1675,32 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 	}
 	prop_object_iterator_release(piter);
 	prop_object_release(pdict);
-#else // XOSVIEW_OPENBSD
+#else /* XOSVIEW_OPENBSD */
 	float total_capacity = 0, total_charge = 0, total_low = 0, total_crit = 0;
 	char battery[16];
 	while (batteries < 1024) {
 		float val = -1.0;
 		snprintf(battery, 15, "acpibat%d", batteries);
-		BSDGetSensor(battery, "amphour0", &val); // full capacity
-		if (val < 0) // no more batteries
+		BSDGetSensor(battery, "amphour0", &val, NULL); /* full capacity */
+		if (val < 0) /* no more batteries */
 			break;
 		batteries++;
 		total_capacity += val;
-		BSDGetSensor(battery, "amphour1", &val); // warning capacity
+		BSDGetSensor(battery, "amphour1", &val, NULL); /* warning capacity */
 		total_low += val;
-		BSDGetSensor(battery, "amphour2", &val); // low capacity
+		BSDGetSensor(battery, "amphour2", &val, NULL); /* low capacity */
 		total_crit += val;
-		BSDGetSensor(battery, "amphour3", &val); // remaining
+		BSDGetSensor(battery, "amphour3", &val, NULL); /* remaining */
 		total_charge += val;
-		BSDGetSensor(battery, "raw0", &val); // state
+		BSDGetSensor(battery, "raw0", &val, NULL); /* state */
 		if ((int)val == 1)
 			*state |= XOSVIEW_BATT_DISCHARGING;
 		else if ((int)val == 2)
 			*state |= XOSVIEW_BATT_CHARGING;
-		// there's also 0 state for idle/full
+		/* there's also 0 state for idle/full */
 	}
 #endif
-	if (batteries == 0) { // all batteries are off
+	if (batteries == 0) { /* all batteries are off */
 		*state = XOSVIEW_BATT_NONE;
 		*remaining = 0;
 		return;
@@ -1708,16 +1708,16 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 	*remaining = 100 * total_charge / total_capacity;
 	if ( !(*state & XOSVIEW_BATT_CHARGING) &&
 	     !(*state & XOSVIEW_BATT_DISCHARGING) )
-		*state |= XOSVIEW_BATT_FULL;  // it's full when not charging nor discharging
+		*state |= XOSVIEW_BATT_FULL;  /* it's full when not charging nor discharging */
 	if (total_capacity < total_low)
 		*state |= XOSVIEW_BATT_LOW;
 	if (total_capacity < total_crit)
 		*state |= XOSVIEW_BATT_CRITICAL;
-#else // XOSVIEW_FREEBSD || XOSVIEW_DFBSD
+#else /* XOSVIEW_FREEBSD || XOSVIEW_DFBSD */
 	/* Adapted from acpiconf and apm. */
 	int fd;
 	if ( (fd = open(ACPIDEV, O_RDONLY)) == -1 ) {
-		// No ACPI -> try APM
+		/* No ACPI -> try APM */
 		if ( (fd = open(APMDEV, O_RDONLY)) == -1 )
 			err(EX_OSFILE, "could not open %s or %s", ACPIDEV, APMDEV);
 		struct apm_info aip;
@@ -1726,7 +1726,7 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 		if ( close(fd) == -1 )
 			err(EX_OSERR, "Could not close %s", APMDEV);
 		if (aip.ai_batt_life <= 100)
-			*remaining = aip.ai_batt_life; // only 0-100 are valid values
+			*remaining = aip.ai_batt_life; /* only 0-100 are valid values */
 		else
 			*remaining = 0;
 		if (aip.ai_batt_stat == 0)
@@ -1741,7 +1741,7 @@ BSDGetBatteryInfo(int *remaining, unsigned int *state) {
 			*state = XOSVIEW_BATT_NONE;
 		return;
 	}
-	// ACPI
+	/* ACPI */
 	union acpi_battery_ioctl_arg battio;
 	battio.unit = ACPI_BATTERY_ALL_UNITS;
 	if ( ioctl(fd, ACPIIO_BATT_GET_BATTINFO, &battio) == -1 )

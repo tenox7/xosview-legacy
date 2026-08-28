@@ -1,7 +1,7 @@
 PLATFORM = osr6
-#  The UDK C++ driver is /udk/usr/ccs/bin/CC; gcc from Skunkware is the more
+#  The UDK C driver is /udk/usr/ccs/bin/cc; gcc from Skunkware is the more
 #  common choice and is what this assumes.
-CXX = g++
+CC = gcc
 #  X11R6 is off the default paths and OpenServer ships no libXpm.
 CPPFLAGS += -I/usr/X11R6/include
 LDFLAGS += -L/usr/X11R6/lib

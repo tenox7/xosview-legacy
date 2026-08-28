@@ -1,4 +1,4 @@
 PLATFORM = bsd
-CXX = c++
+CC = cc
 CPPFLAGS += -I/usr/local/include
 LDFLAGS += -ldevstat -lkvm -L/usr/local/lib
