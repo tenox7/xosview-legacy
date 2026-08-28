@@ -21,6 +21,10 @@ static const char * const versionString = "xosview version: Git";
 
 static const char NAME[] = "xosview@";
 
+//  HP-UX pulls MIN and MAX in through <sys/param.h>.
+#undef MIN
+#undef MAX
+
 #if !defined(__GNUC__)
 
 #define MIN(x,y)		\
@@ -102,7 +106,8 @@ XOSView::XOSView( const char * instName, int argc, char *argv[] ) : XWin(),
   yoff_ = 0;
   nummeters_ = 0;
   meters_ = NULL;
-  name_ = const_cast<char *>("xosview");
+  static char defaultName[] = "xosview";
+  name_ = defaultName;
   _deferred_resize = true;
   _deferred_redraw = true;
   windowVisibility = OBSCURED;

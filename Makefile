@@ -24,9 +24,14 @@ OPTFLAGS ?= -Wall -O3
 
 XPMLIB ?= -lXpm
 
+# Compilers other than gcc spell these differently; see targets/hpux11
+
+DEPFLAGS ?= -MMD
+NOWRITESTRINGS ?= -Wno-write-strings
+
 # Required build arguments
 
-CPPFLAGS += $(OPTFLAGS) -I. -MMD
+CPPFLAGS += $(OPTFLAGS) -I. $(DEPFLAGS)
 LDLIBS += -lX11 $(XPMLIB)
 
 OBJS = Host.o \
@@ -107,6 +112,16 @@ OBJS += irix65/MeterMaker.o \
 CPPFLAGS += -Iirix65/
 endif
 
+ifeq ($(PLATFORM), hpux)
+OBJS += hpux/MeterMaker.o \
+        hpux/cpumeter.o \
+        hpux/loadmeter.o \
+        hpux/memmeter.o \
+        hpux/pagemeter.o \
+        hpux/swapmeter.o
+CPPFLAGS += -Ihpux/
+endif
+
 ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \
@@ -161,13 +176,19 @@ endif
 #  than next to the object, and is too old to have -MF, so look for both names.
 DEPS := $(OBJS:.o=.d) $(notdir $(OBJS:.o=.d))
 
+#  HP-UX keeps template implementations in a .cc next to the extension-less
+#  standard headers, so make's builtin "program out of a source file" rule
+#  tries to remake <limits> from limits.cc when a .d file names it.
+%: %.cc
+%: %.o
+
 xosview:	$(OBJS)
 		$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 defaultstring.cc:	Xdefaults defresources.awk
 		$(AWK) -f defresources.awk Xdefaults > defaultstring.cc
 
-Xrm.o:		CXXFLAGS += -Wno-write-strings
+Xrm.o:		CXXFLAGS += $(NOWRITESTRINGS)
 
 .PHONY:		dist install clean
 

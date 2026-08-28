@@ -11,6 +11,19 @@
 
 static int MAX_SWAP_AREAS = 16;
 
+//  Size of one swap pool, in 1 KB blocks.
+static unsigned long swapblocks( const struct pst_swapinfo &si ){
+#ifdef HPUX9
+//  HP-UX 9 has no pss_nblksenabled and keeps the size of a block device
+//  pool and of a file system pool in a union instead.
+  if ( !(si.pss_flags & SW_ENABLED) )
+    return 0;
+  return (si.pss_flags & SW_BLOCK) ? si.pss_nblks : si.pss_allocated;
+#else
+  return si.pss_nblksenabled;
+#endif
+}
+
 SwapMeter::SwapMeter( XOSView *parent )
 : FieldMeterDecay( parent, 2, "SWAP", "USED/FREE" ){
 }
@@ -50,8 +63,9 @@ void SwapMeter::getswapinfo( void ){
       pstat_getswap(&swapinfo, sizeof(swapinfo), 1, i);
       if (swapinfo.pss_idx == (unsigned)i)
           {
-          total_ += (swapinfo.pss_nblksenabled * 1024);
-          fields_[1] += (swapinfo.pss_nfpgs * 4 * 1024);
+          //  In doubles: 4 GB of swap overflows a 32 bit block count.
+          total_ += (double)swapblocks( swapinfo ) * 1024.0;
+          fields_[1] += (double)swapinfo.pss_nfpgs * 4.0 * 1024.0;
           }
       }
 

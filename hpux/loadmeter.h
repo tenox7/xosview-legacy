@@ -8,9 +8,9 @@
 #define _LOADMETER_H_
 
 
-#include "fieldmeterdecay.h"
+#include "fieldmetergraph.h"
 
-class LoadMeter : public FieldMeterDecay {
+class LoadMeter : public FieldMeterGraph {
 public:
   LoadMeter( XOSView *parent );
   ~LoadMeter( void );
@@ -22,9 +22,9 @@ public:
 protected:
 
   void getloadinfo( void );
-  unsigned long procloadcol_, warnloadcol_;
+  unsigned long procloadcol_, warnloadcol_, critloadcol_;
 private:
-  int alarmThreshold;
+  int warnThreshold, critThreshold, alarmstate, lastalarmstate;
 };
 
 
