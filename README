@@ -9,6 +9,16 @@ variables. In general, you should be able to build on Linux using:
   $ make
   $ make install
 
+make identifies the system with uname and builds with the matching file
+from the 'targets' directory.  To choose one yourself:
+
+  $ make TARGET=hpux9
+
+or copy it to .config, which the Makefile reads in preference to
+guessing:
+
+  $ cp targets/hpux9 .config
+
 To change the target prefix, use, for example:
 
   $ make install PREFIX=/usr
@@ -16,23 +26,8 @@ To change the target prefix, use, for example:
 For more fine-grained control, see the Makefile for available
 variables.
 
-To specify a particular platform, use one of:
-
-  $ make PLATFORM=linux
-  $ make PLATFORM=bsd
-  $ make PLATFORM=irix65
-  $ make PLATFORM=sunos5
-  $ make PLATFORM=gnu
-
 Please see the README file for your platform for any special
 instructions for running xosview on that platform.
-
-The Makefile picks up additional variables from a .config file in the
-source code directory.  You may prefer to use this if you are doing
-several builds for testing and debugging.
-
-Some platform variants require specific build flags; see the 'targets'
-directory for preset .config files.
 
 See the man page for information on the xosview display and how to
 customize it.

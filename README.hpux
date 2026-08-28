@@ -13,9 +13,10 @@
   Building
   --------
 
-    cp targets/hpux9 .config       # HP-UX 9, gcc 2.7
-    cp targets/hpux11 .config      # HP-UX 11, aCC
     gmake
+
+  9.x builds targets/hpux9 (gcc 2.7) and 11.x targets/hpux11 (aCC).
+  Override with "gmake TARGET=hpux9".
 
   The build needs GNU make 3.77 or newer.  The 3.75 that HP-UX 9 ships as
   /usr/local/gnu/bin/gmake has neither ?= nor target specific variables and

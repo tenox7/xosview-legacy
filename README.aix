@@ -12,9 +12,11 @@
   Building
   --------
 
-    cp targets/aix5 .config        # AIX 5.1 and later
-    cp targets/aix4 .config        # AIX 4.1 through 4.3
     gmake
+
+  The release is identified by the presence of libperfstat: AIX 5.1 and
+  later build targets/aix5, and AIX 4.x targets/aix4.  Override with
+  "gmake TARGET=aix4".
 
   The build needs GNU make; the AIX make will not parse the Makefile.  It
   needs no libraries beyond libX11, and in particular does not need

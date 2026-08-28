@@ -1,4 +1,16 @@
--include .config
+#  The build is configured by one file from targets/.  Copying it to .config
+#  pins the choice, "make TARGET=hpux9" makes it for one build, and with
+#  neither of those guess-target picks one from uname.
+ifdef TARGET
+CONFIG := targets/$(TARGET)
+else
+CONFIG := $(wildcard .config)
+ifeq ($(CONFIG),)
+CONFIG := targets/$(shell sh ./guess-target)
+endif
+endif
+
+include $(CONFIG)
 
 AWK ?= awk
 INSTALL ?= install
