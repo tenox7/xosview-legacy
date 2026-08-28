@@ -235,8 +235,7 @@ Displays the version number.
 Sets the Resource name xosview will use (same as the \-name option
 for typical X applications like xterm).  When performing resource
 lookups, xosview will look under \fIname\fP, and then under
-``xosview''.  For an example, perform the following (as
-documented in README.netbsd):
+``xosview''.  For an example, perform the following:
 .RS
   xrdb \-merge Xdefaults.stipple
   xosview \-name xosvstipple &
@@ -789,9 +788,7 @@ does not work in decay mode.
 
 xosview*net: (True or False)
 .RS
-If True xosview will display the NetMeter.  Linux users will have to configure
-their kernels and setup some ip accounting rules to make this work.  See the
-file README.linux which comes with the xosview distribution for details.
+If True xosview will display the NetMeter.
 .RE
 
 xosview*netBandwidth: \fImaxBytes\fP
@@ -903,8 +900,7 @@ portbase instead of "True".  If a portBase is used then xosview will use
 it instead of trying to autodetect.
 
 For this to work on Linux xosview needs to be suid root in order to have
-access to the ports.  See the file README.linux which comes with the xosview
-distribution for more details.
+access to the ports.  See README for more details.
 .RE
 
 xosview*serialOnColor: \fIcolor\fP
