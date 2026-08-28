@@ -159,6 +159,18 @@ XPMLIB =
 LDLIBS += -lmas -lsocket -lnsl -lm
 endif
 
+ifeq ($(PLATFORM), unixware)
+OBJS += unixware/MeterMaker.o \
+        unixware/cpumeter.o \
+        unixware/loadmeter.o \
+        unixware/memmeter.o \
+        unixware/swapmeter.o \
+        unixware/unixwarestats.o
+CPPFLAGS += -Iunixware/ -DNO_XPM
+XPMLIB =
+LDLIBS += -lmas -lelf -lsocket -lnsl -lm
+endif
+
 ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \

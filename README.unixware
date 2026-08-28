@@ -1,0 +1,46 @@
+
+  The UnixWare 7 port provides these meters:
+
+    - load meter
+    - cpu meter:  user | system | io-wait | idle
+    - mem meter:  used | free
+    - swap meter: used | free
+
+  Building
+  --------
+
+    gmake
+
+  targets/unixware builds with gcc; the UDK C++ driver at /usr/ccs/bin/CC
+  works too if that is what is installed.  UnixWare ships no libXpm, so the
+  target builds with -DNO_XPM, which drops support for the pixmapName
+  resource and leaves everything else intact.
+
+  Where the numbers come from
+  ---------------------------
+
+  Everything goes through the small interface in unixware/unixwarestats.h.
+  The cpu counters and free memory come from the MAS metric file that sar(1)
+  and top read, and swap from swapctl(2).  None of those need privileges.
+
+  The load average is the exception: MAS does not carry it, so it is read
+  out of /dev/kmem at the address nlist() resolves for avenrun in
+  /stand/unix.  That needs root, or
+
+    chgrp sys /usr/local/bin/xosview
+    chmod 2755 /usr/local/bin/xosview
+
+  Without it the load meter disables itself and the rest still runs.
+
+  As on OpenServer, the kernel publishes free memory as an accumulator
+  rather than a level, so the mem meter reads zero free for its first sample
+  and is correct from the second on, and it cannot separate out the file
+  cache.
+
+  Untested
+  --------
+
+  This port has not yet been built or run on real hardware.  The MAS
+  metrics are the part most likely to need work: the sister sng project
+  reads cpu the same way on this release, but never got memory out of MAS
+  there, so FREEMEM may well need a different metric id here.

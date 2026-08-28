@@ -1,0 +1,4 @@
+PLATFORM = unixware
+#  The UDK C++ driver is /usr/ccs/bin/CC; gcc is the more common choice and
+#  is what this assumes.
+CXX = g++
