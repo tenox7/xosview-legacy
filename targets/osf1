@@ -1,9 +1,0 @@
-PLATFORM = osf1
-#  Compaq/DEC C on 4.0 and later; use CC=gcc where that is what is
-#  installed.  -std strict_ansi is not used, the headers need the default.
-CC = cc
-OPTFLAGS = -O2
-#  Tru64 ships no libXpm; only the pixmapName resource is lost.
-LDFLAGS += -L/usr/shlib
-#  cc spells -MMD -MD.
-DEPFLAGS = -MD

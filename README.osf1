@@ -14,10 +14,10 @@
   Building
   --------
 
-    gmake
+    make
 
-  targets/osf1 builds with the Compaq C compiler, cc.  Set CC=gcc if that
-  is what is installed.  Tru64 ships no libXpm, so the target builds
+  The osf1 target builds with the Compaq C compiler, cc.  Say
+  "make osf1 CC=gcc" if that is what is installed.  Tru64 ships no libXpm, so the target builds
   with -DNO_XPM, which drops support for the pixmapName resource and
   leaves everything else intact.
 

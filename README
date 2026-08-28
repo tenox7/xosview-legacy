@@ -7,28 +7,25 @@ The source is C: C89 for the vendor Unix ports, which is all their
 compilers accept, and whatever the local gcc or clang takes for Linux
 and the BSDs.
 
-The build no longer uses GNU autoconfig.  Control is via Makefile
-variables. In general, you should be able to build on Linux using:
+The build no longer uses GNU autoconfig, and needs no GNU make either:
+one Makefile holds every platform, and the vendor make will do.
 
   $ make
   $ make install
 
-make identifies the system with uname and builds with the matching file
-from the 'targets' directory.  To choose one yourself:
+"make" identifies the system with uname and hands off to the matching
+target.  To pick one yourself, name it:
 
-  $ make TARGET=hpux9
+  $ make hpux9
 
-or copy it to .config, which the Makefile reads in preference to
-guessing:
+The targets are linux, gnu, freebsd, netbsd, openbsd, dragonflybsd,
+sunos5, aix4, aix5, hpux9, hpux10, hpux11, irix5, irix65, osf1, osr6
+and unixware.  Each one sets CC, CFLAGS, LDFLAGS, LIBS and the meter
+objects for its platform, and any of those can be overridden on the
+command line:
 
-  $ cp targets/hpux9 .config
-
-To change the target prefix, use, for example:
-
+  $ make linux CC=clang
   $ make install PREFIX=/usr
-
-For more fine-grained control, see the Makefile for available
-variables.
 
 Please see the README file for your platform for any special
 instructions for running xosview on that platform.

@@ -37,15 +37,15 @@
   IRIX 5.3
   --------
 
-  targets/irix5 builds the same meters for 5.3, minus the gfx meter, which
+  The irix5 target builds the same meters for 5.3, minus the gfx meter, which
   needs the 6.5 graphics pipe interface.  The mem meter drops the chunk
   allocator terms there, as 5.3 predates them, so its file system field is
   just the buffer cache.
 
   Building for 5.3 means gcc from tgcware, which cannot drive the linker
-  itself: targets/irix5 names the crt objects and the gcc runtime by hand
-  through the Makefile's LINK variable.  Correct IRIX5_GCCLIB and IRIX5_LD
-  in that file to match what is installed.
+  itself: the irix5 target names the crt objects and the gcc runtime by
+  hand.  Correct IRIX5_GCCLIB and IRIX5_LD in the Makefile to match what
+  is installed.
 
   This has not been built or run on 5.3 hardware.  The link line above is
   the part most likely to need work.

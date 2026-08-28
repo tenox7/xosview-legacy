@@ -11,10 +11,10 @@
   Building
   --------
 
-    gmake
+    make
 
-  targets/osr6 builds with gcc; the UDK C driver at /udk/usr/ccs/bin/cc
-  works too if that is what is installed.  OpenServer ships no libXpm, so
+  The osr6 target builds with gcc; say "make osr6 CC=/udk/usr/ccs/bin/cc"
+  to use the UDK C driver instead.  OpenServer ships no libXpm, so
   the target builds with -DNO_XPM, which drops support for the pixmapName
   resource and leaves everything else intact.
 

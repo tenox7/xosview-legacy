@@ -5,10 +5,8 @@
   This version of xosview no longer supports NetBSD versions below 4.0. Users
 of older versions need xosview version below 1.9.
 
-For building xosview by hand, add these lines into .config.
-
-CPPFLAGS += -I/usr/X11R7/include
-LDLIBS += -lkvm -lprop -L/usr/X11R7/lib -Wl,--rpath=/usr/X11R7/lib
+"make netbsd" carries the include and library paths and the extra
+libraries this system needs.
 
 
 *****************************************************************************

@@ -5,10 +5,8 @@ of the box --- if not, it's a bug.
   This version of xosview no longer supports FreeBSD versions below 7.0. Users
 of older versions need xosview version below 1.9.
 
-For building xosview by hand, add these lines into .config.
-
-CPPFLAGS += -I/usr/local/include
-LDLIBS += -lkvm -ldevstat -L/usr/local/lib
+"make freebsd" carries the include and library paths and the extra
+libraries this system needs.
 
 
 *****************************************************************************

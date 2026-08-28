@@ -12,14 +12,13 @@
   Building
   --------
 
-    gmake
+    make
 
   The release is identified by the presence of libperfstat: AIX 5.1 and
-  later build targets/aix5, and AIX 4.x targets/aix4.  Override with
-  "gmake TARGET=aix4".
+  later build the aix5 target, and AIX 4.x aix4.  Name one to override:
+  "make aix4".
 
-  The build needs GNU make; the AIX make will not parse the Makefile.  It
-  needs no libraries beyond libX11, and in particular does not need
+  It needs no libraries beyond libX11, and in particular does not need
   libXpm, which AIX does not ship: the targets define -DNO_XPM, which
   drops support for the pixmapName resource and leaves everything else
   intact.
@@ -29,7 +28,7 @@
 
   The meters do not read any statistic directly.  They go through the
   small interface in aix/aixstats.h, which has two implementations; the
-  target file picks one by setting AIXSTATS.
+  aix4 and aix5 targets pick one by naming its object.
 
   aix/perfstat.c is the AIX 5.x back end and the default.  It uses
   libperfstat, which arrived in AIX 5.1 and is the supported interface

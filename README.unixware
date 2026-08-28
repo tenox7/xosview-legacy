@@ -9,10 +9,10 @@
   Building
   --------
 
-    gmake
+    make
 
-  targets/unixware builds with gcc; the UDK C driver at /usr/ccs/bin/cc
-  works too if that is what is installed.  UnixWare ships no libXpm, so the
+  The unixware target builds with gcc; say
+  "make unixware CC=/usr/ccs/bin/cc" to use the UDK C driver instead.  UnixWare ships no libXpm, so the
   target builds with -DNO_XPM, which drops support for the pixmapName
   resource and leaves everything else intact.
 

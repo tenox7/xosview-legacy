@@ -1,257 +1,259 @@
-#  The build is configured by one file from targets/.  Copying it to .config
-#  pins the choice, "make TARGET=hpux9" makes it for one build, and with
-#  neither of those guess-target picks one from uname.
-ifdef TARGET
-CONFIG := targets/$(TARGET)
-else
-CONFIG := $(wildcard .config)
-ifeq ($(CONFIG),)
-CONFIG := targets/$(shell sh ./guess-target)
-endif
-endif
+CC = gcc
+CFLAGS = -O2 -I.
+LDFLAGS =
+LIBS = -lX11 -lXpm
+TARGET = xosview
 
-include $(CONFIG)
+AWK = awk
 
-AWK ?= awk
-INSTALL ?= install
-#  AIX has an install(1) that does not know -d, so creating the target
-#  directories is kept separate from copying the files into them.
-INSTALLDIR ?= $(INSTALL) -d
-PLATFORM ?= linux
+PREFIX = /usr/local
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/share/man
+XDGAPPSDIR = $(PREFIX)/share/applications
+ICONDIR = $(PREFIX)/share/icons/hicolor
 
-# Installation paths
+CORE_OBJS = Xrm.o bitfieldmeter.o bitmeter.o defaultstring.o fieldmeter.o \
+	main.o meter.o stringutils.o xosview.o xwin.o
 
-PREFIX ?= /usr/local
+# Each OS target below passes its own object list in.
+PLAT_OBJS =
 
-BINDIR ?= $(PREFIX)/bin
-MANDIR ?= $(PREFIX)/share/man
-XDGAPPSDIR ?= $(PREFIX)/share/applications
-ICONDIR ?= $(PREFIX)/share/icons/hicolor
+OBJECTS = $(CORE_OBJS) $(PLAT_OBJS)
 
-# Optional build arguments; user may wish to override
+LINUX_OBJS = sensorfieldmeter.o linux/MeterMaker.o linux/acpitemp.o \
+	linux/btrymeter.o linux/cpumeter.o linux/diskmeter.o linux/intmeter.o \
+	linux/intratemeter.o linux/lmstemp.o linux/loadmeter.o \
+	linux/memmeter.o linux/netmeter.o linux/nfsmeter.o linux/pagemeter.o \
+	linux/raidmeter.o linux/serialmeter.o linux/swapmeter.o \
+	linux/wirelessmeter.o
 
-OPTFLAGS ?= -Wall -O3
+BSD_OBJS = sensorfieldmeter.o bsd/MeterMaker.o bsd/btrymeter.o \
+	bsd/cpumeter.o bsd/diskmeter.o bsd/intmeter.o bsd/intratemeter.o \
+	bsd/kernel.o bsd/loadmeter.o bsd/memmeter.o bsd/netmeter.o \
+	bsd/pagemeter.o bsd/sensor.o bsd/swapmeter.o
 
-# Platforms without libXpm clear this and define -DNO_XPM
+SUNOS5_OBJS = sunos5/MeterMaker.o sunos5/cpumeter.o sunos5/diskmeter.o \
+	sunos5/intratemeter.o sunos5/kstats.o sunos5/loadmeter.o \
+	sunos5/memmeter.o sunos5/netmeter.o sunos5/pagemeter.o \
+	sunos5/swapmeter.o
 
-XPMLIB ?= -lXpm
+# aix/perfstat.c is the AIX 5.1 and later back end, aix/kmem.c the 4.x one.
+AIX_OBJS = aix/MeterMaker.o aix/cpumeter.o aix/diskmeter.o aix/loadmeter.o \
+	aix/memmeter.o aix/netmeter.o aix/pagemeter.o aix/swapmeter.o
 
-# Compilers other than gcc spell this differently; see targets/hpux11
+HPUX_OBJS = hpux/MeterMaker.o hpux/cpumeter.o hpux/loadmeter.o \
+	hpux/memmeter.o hpux/pagemeter.o hpux/swapmeter.o
 
-DEPFLAGS ?= -MMD
+# irix65/gfxmeter.c is 6.5 only; the 5.3 target leaves it out.
+IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/diskmeter.o \
+	irix65/loadmeter.o irix65/memmeter.o irix65/sarmeter.o
 
-# Required build arguments
+OSF1_OBJS = osf1/MeterMaker.o osf1/cpumeter.o osf1/loadmeter.o \
+	osf1/memmeter.o osf1/osf1stats.o osf1/pagemeter.o osf1/swapmeter.o
 
-CPPFLAGS += $(OPTFLAGS) -I. $(DEPFLAGS)
-LDLIBS += -lX11 $(XPMLIB)
+OSR6_OBJS = osr6/MeterMaker.o osr6/cpumeter.o osr6/loadmeter.o \
+	osr6/memmeter.o osr6/osr6stats.o osr6/swapmeter.o
 
-OBJS = Xrm.o \
-	bitfieldmeter.o \
-	bitmeter.o \
-	defaultstring.o \
-	fieldmeter.o \
-	main.o \
-	meter.o \
-	stringutils.o \
-	xosview.o \
-	xwin.o
+UNIXWARE_OBJS = unixware/MeterMaker.o unixware/cpumeter.o \
+	unixware/loadmeter.o unixware/memmeter.o unixware/swapmeter.o \
+	unixware/unixwarestats.o
 
-# Optional platform type
+GNU_OBJS = gnu/MeterMaker.o gnu/get_def_pager.o gnu/loadmeter.o \
+	gnu/memmeter.o gnu/pagemeter.o gnu/swapmeter.o
 
-ifeq ($(PLATFORM), linux)
-ARCH = $(shell uname -m)
-OBJS += sensorfieldmeter.o \
-	linux/MeterMaker.o \
-	linux/btrymeter.o \
-	linux/cpumeter.o \
-	linux/diskmeter.o \
-	linux/intmeter.o \
-	linux/intratemeter.o \
-	linux/lmstemp.o \
-	linux/loadmeter.o \
-	linux/memmeter.o \
-	linux/netmeter.o \
-	linux/nfsmeter.o \
-	linux/pagemeter.o \
-	linux/raidmeter.o \
-	linux/serialmeter.o \
-	linux/swapmeter.o \
-	linux/wirelessmeter.o \
-	linux/acpitemp.o
-ifeq ($(findstring 86,$(ARCH)),86)
-OBJS += linux/coretemp.o
-endif
-CPPFLAGS += -Ilinux/
-LDLIBS += -lm
-endif
+# Auto detect OS
+all:
+	@s=`uname -s`; r=`uname -r`; v=`uname -v`; \
+	case "$$s" in \
+	  Linux)     t=linux;; \
+	  GNU)       t=gnu;; \
+	  OSF1)      t=osf1;; \
+	  FreeBSD)   t=freebsd;; \
+	  NetBSD)    t=netbsd;; \
+	  OpenBSD)   t=openbsd;; \
+	  DragonFly) t=dragonflybsd;; \
+	  SunOS)     case "$$r" in 5.*) t=sunos5;; *) echo "SunOS $$r is not supported"; exit 1;; esac;; \
+	  IRIX|IRIX64) case "$$r" in 5.*) t=irix5;; *) t=irix65;; esac;; \
+	  UnixWare|UNIX_SV) t=unixware;; \
+	  SCO_SV)    case "$$v" in 6.*) t=osr6;; *) echo "OpenServer $$v is not supported"; exit 1;; esac;; \
+	  AIX)       if [ -f /usr/lib/libperfstat.a ]; then t=aix5; else t=aix4; fi;; \
+	  HP-UX)     case "$$r" in \
+	               *.09.*) t=hpux9;; \
+	               *.10.*) t=hpux10;; \
+	               *) t=hpux11;; \
+	             esac;; \
+	  *) echo "$$s not known here, building for linux"; t=linux;; \
+	esac; \
+	echo "=> make $$t"; \
+	$(MAKE) $$t
 
-ifeq ($(PLATFORM), bsd)
-ARCH = $(shell uname -m)
-OBJS += sensorfieldmeter.o \
-        bsd/MeterMaker.o \
-        bsd/btrymeter.o \
-        bsd/cpumeter.o \
-        bsd/diskmeter.o \
-        bsd/intmeter.o \
-        bsd/intratemeter.o \
-        bsd/kernel.o \
-        bsd/loadmeter.o \
-        bsd/memmeter.o \
-        bsd/netmeter.o \
-        bsd/pagemeter.o \
-        bsd/swapmeter.o \
-        bsd/sensor.o
-ifeq ($(ARCH),$(filter $(ARCH),i386 amd64 x86_64))
-OBJS += bsd/coretemp.o
-endif
-CPPFLAGS += -Ibsd/
-LDLIBS += -lm
-endif
+$(TARGET): $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 
-ifeq ($(PLATFORM), irix65)
-OBJS += irix65/MeterMaker.o \
-        irix65/cpumeter.o \
-        irix65/diskmeter.o \
-        irix65/loadmeter.o \
-        irix65/memmeter.o \
-        irix65/sarmeter.o
-#  The graphics pipe meter is 6.5 only; targets/irix5 clears this.
-IRIXGFX ?= irix65/gfxmeter.o
-OBJS += $(IRIXGFX)
-CPPFLAGS += -Iirix65/
-endif
+# POSIX suffix rule, not a GNU "%.o: %.c" pattern rule: the vendor makes
+# ignore pattern rules, and their built-in .c.o has no -o $@, which drops
+# the object in the current directory instead of beside its source.
+.SUFFIXES: .c .o
 
-ifeq ($(PLATFORM), hpux)
-#  targets/hpux9 adds its compatibility shim here.
-HPUXCOMPAT ?=
-OBJS += $(HPUXCOMPAT) \
-        hpux/MeterMaker.o \
-        hpux/cpumeter.o \
-        hpux/loadmeter.o \
-        hpux/memmeter.o \
-        hpux/pagemeter.o \
-        hpux/swapmeter.o
-CPPFLAGS += -Ihpux/
-endif
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
 
-ifeq ($(PLATFORM), osf1)
-OBJS += osf1/MeterMaker.o \
-        osf1/cpumeter.o \
-        osf1/loadmeter.o \
-        osf1/memmeter.o \
-        osf1/osf1stats.o \
-        osf1/pagemeter.o \
-        osf1/swapmeter.o
-CPPFLAGS += -Iosf1/ -DNO_XPM
-XPMLIB =
-LDLIBS += -lm
-endif
+defaultstring.c: Xdefaults defresources.awk
+	$(AWK) -f defresources.awk Xdefaults > defaultstring.c
 
-ifeq ($(PLATFORM), osr6)
-OBJS += osr6/MeterMaker.o \
-        osr6/cpumeter.o \
-        osr6/loadmeter.o \
-        osr6/memmeter.o \
-        osr6/osr6stats.o \
-        osr6/swapmeter.o
-CPPFLAGS += -Iosr6/ -DNO_XPM
-XPMLIB =
-LDLIBS += -lmas -lsocket -lnsl -lm
-endif
+# linux/coretemp.c and bsd/coretemp.c read x86 MSRs and build there only.
+linux:
+	@case `uname -m` in \
+	  *86*) x=linux/coretemp.o;; \
+	  *) x=;; \
+	esac; \
+	$(MAKE) CFLAGS="$(CFLAGS) -Ilinux" LIBS="-lX11 -lXpm -lm" \
+	  PLAT_OBJS="$(LINUX_OBJS) $$x" $(TARGET)
 
-ifeq ($(PLATFORM), unixware)
-OBJS += unixware/MeterMaker.o \
-        unixware/cpumeter.o \
-        unixware/loadmeter.o \
-        unixware/memmeter.o \
-        unixware/swapmeter.o \
-        unixware/unixwarestats.o
-CPPFLAGS += -Iunixware/ -DNO_XPM
-XPMLIB =
-LDLIBS += -lmas -lelf -lsocket -lnsl -lm
-endif
+gnu:
+	$(MAKE) CFLAGS="$(CFLAGS) -Ignu" LIBS="-lX11 -lXpm" \
+	  PLAT_OBJS="$(GNU_OBJS)" $(TARGET)
 
-ifeq ($(PLATFORM), sunos5)
-OBJS += sunos5/MeterMaker.o \
-        sunos5/cpumeter.o \
-        sunos5/kstats.o \
-        sunos5/diskmeter.o \
-        sunos5/loadmeter.o \
-        sunos5/memmeter.o \
-        sunos5/netmeter.o \
-        sunos5/pagemeter.o \
-        sunos5/swapmeter.o \
-        sunos5/intratemeter.o
-CPPFLAGS += -Isunos5/
-LDLIBS += -lkstat -lnsl -lsocket
-INSTALL = ginstall
-endif
+freebsd:
+	@case `uname -m` in \
+	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
+	  *) x=;; \
+	esac; \
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Ibsd -I/usr/local/include" \
+	  LDFLAGS="-L/usr/local/lib" LIBS="-lX11 -lXpm -ldevstat -lkvm -lm" \
+	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-ifeq ($(PLATFORM), aix)
-#  AIXSTATS picks the back end the meters read their statistics through:
-#  perfstat uses libperfstat, which arrived in AIX 5.1, and kmem reads kernel
-#  memory directly for the AIX 4.x releases that predate it.
-AIXSTATS ?= perfstat
-OBJS += aix/MeterMaker.o \
-        aix/cpumeter.o \
-        aix/diskmeter.o \
-        aix/loadmeter.o \
-        aix/memmeter.o \
-        aix/netmeter.o \
-        aix/pagemeter.o \
-        aix/swapmeter.o \
-        aix/$(AIXSTATS).o
-CPPFLAGS += -Iaix/ -DNO_XPM
-XPMLIB =
-LDLIBS += -lm
-ifeq ($(AIXSTATS), perfstat)
-LDLIBS += -lperfstat
-else
-#  Only the AIX 4.x toolchain needs the declarations aixcompat.h supplies.
-CPPFLAGS += -include aix/aixcompat.h
-endif
-endif
+netbsd:
+	@case `uname -m` in \
+	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
+	  *) x=;; \
+	esac; \
+	$(MAKE) CFLAGS="$(CFLAGS) -Ibsd -I/usr/X11R7/include" \
+	  LDFLAGS="-L/usr/X11R7/lib -Wl,--rpath=/usr/X11R7/lib" \
+	  LIBS="-lX11 -lXpm -lkvm -lprop -lm" \
+	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-ifeq ($(PLATFORM), gnu)
-OBJS += gnu/get_def_pager.o \
-	gnu/loadmeter.o \
-	gnu/memmeter.o \
-	gnu/MeterMaker.o \
-	gnu/pagemeter.o \
-	gnu/swapmeter.o
-CPPFLAGS += -Ignu/
-endif
+openbsd:
+	@case `uname -m` in \
+	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
+	  *) x=;; \
+	esac; \
+	$(MAKE) CFLAGS="$(CFLAGS) -Ibsd -I/usr/X11R6/include" \
+	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lXpm -lkvm -lm" \
+	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-#  gcc 2.x writes the -MMD dependency file into the current directory rather
-#  than next to the object, and is too old to have -MF, so look for both names.
-DEPS := $(OBJS:.o=.d) $(notdir $(OBJS:.o=.d))
+dragonflybsd:
+	@case `uname -m` in \
+	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
+	  *) x=;; \
+	esac; \
+	$(MAKE) CFLAGS="$(CFLAGS) -Ibsd -I/usr/pkg/include -I/usr/local/include" \
+	  LDFLAGS="-L/usr/pkg/lib -L/usr/local/lib" \
+	  LIBS="-lX11 -lXpm -lkvm -lkinfo -ldevstat -lm" \
+	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-#  Toolchains that can not drive the linker themselves override this; see
-#  targets/irix5.
-LINK ?= $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+sunos5:
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Isunos5" \
+	  LIBS="-lX11 -lXpm -lkstat -lnsl -lsocket" \
+	  PLAT_OBJS="$(SUNOS5_OBJS)" $(TARGET)
 
-xosview:	$(OBJS)
-		$(LINK)
+# AIX ships no libXpm; only the pixmapName resource is lost with -DNO_XPM.
+# 4.x predates libperfstat, so the statistics come out of kernel memory, and
+# its headers declare neither snprintf nor the strcasecmp family.
+aix4:
+	$(MAKE) CFLAGS="$(CFLAGS) -Iaix -DNO_XPM -include aix/aixcompat.h" \
+	  LIBS="-lX11 -lm" PLAT_OBJS="$(AIX_OBJS) aix/kmem.o" $(TARGET)
 
-defaultstring.c:	Xdefaults defresources.awk
-		$(AWK) -f defresources.awk Xdefaults > defaultstring.c
+aix5:
+	$(MAKE) CFLAGS="$(CFLAGS) -Iaix -DNO_XPM" \
+	  LIBS="-lX11 -lm -lperfstat" \
+	  PLAT_OBJS="$(AIX_OBJS) aix/perfstat.o" $(TARGET)
 
-.PHONY:		dist install clean
+# HP-UX 10.20 and up have the ANSI C compiler at this path; 9.x has it as cc.
+HPUX_CC = /opt/ansic/bin/cc
 
-dist:
-		./mkdist $(VERSION)
+# 9.x keeps X11R5 off the default paths, its linker makes one pass over the
+# archives, so libX11 has to come round again after libXpm, and its libc has
+# routines its headers never declare; hpux/hpux9 makes up the difference.
+# That shim is force included, which HP cc cannot do, so this one target
+# wants gcc rather than the ANSI C compiler the other two use.
+hpux9:
+	$(MAKE) CC=gcc \
+	  CFLAGS="$(CFLAGS) -Ihpux -Ihpux/hpux9 -I/usr/include/X11R5 \
+	    -DNO_PSS_NBLKSENABLED -include hpux/hpux9/compat.h" \
+	  LDFLAGS="-L/usr/lib/X11R5" LIBS="-lXpm -lX11 -lX11" \
+	  PLAT_OBJS="$(HPUX_OBJS) hpux/hpux9/compat.o" $(TARGET)
 
-install:	xosview
-		$(INSTALLDIR) $(DESTDIR)$(BINDIR)
-		$(INSTALLDIR) $(DESTDIR)$(MANDIR)/man1
-		$(INSTALLDIR) $(DESTDIR)$(XDGAPPSDIR)
-		$(INSTALLDIR) $(DESTDIR)$(ICONDIR)/32x32/apps
-		$(INSTALL) -m 755 xosview $(DESTDIR)$(BINDIR)/xosview
-		$(INSTALL) -m 644 xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
-		$(INSTALL) -m 644 xosview.desktop $(DESTDIR)$(XDGAPPSDIR)
-		$(INSTALL) -m 644 xosview.png $(DESTDIR)$(ICONDIR)/32x32/apps
+# 10.20 keeps X11R6 off the default paths and ships no libXpm.
+hpux10:
+	$(MAKE) CC=$(HPUX_CC) \
+	  CFLAGS="-Ae -O -I. -Ihpux -DNO_XPM -I/usr/include/X11R6 \
+	    -I/usr/contrib/X11R6/include" \
+	  LDFLAGS="-L/usr/lib/X11R6 -L/usr/contrib/X11R6/lib" LIBS="-lX11" \
+	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
+
+hpux11:
+	$(MAKE) CC=$(HPUX_CC) CFLAGS="-Ae +O3 -I. -Ihpux -DNO_XPM" \
+	  LDFLAGS="-L/usr/lib/X11R6" LIBS="-lX11" \
+	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
+
+irix65:
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iirix65" LIBS="-lX11 -lXpm" \
+	  PLAT_OBJS="$(IRIX_OBJS) irix65/gfxmeter.o" $(TARGET)
+
+IRIX5_GCCLIB = /usr/tgcware/gcc45/lib/gcc/mips-sgi-irix5.3/4.5.3
+IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
+
+# 5.3 has no libXpm and no graphics pipe meter, and gcc from tgcware cannot
+# drive the linker itself: the crt objects and the gcc runtime have to be
+# named by hand.  Correct the two paths above to match what is installed.
+# gcc fakes _COMPILER_VERSION, which makes SGI's offsetof() reach for the
+# MIPSpro builtin __INTADDR__ that gcc does not have.
+irix5:
+	$(MAKE) $(CORE_OBJS) $(IRIX_OBJS) \
+	  CFLAGS="$(CFLAGS) -Iirix65 -DIRIX5 -DNO_XPM -isystem /usr/include \
+	    -U_COMPILER_VERSION"
+	$(IRIX5_LD) -o $(TARGET) -init __gcc_init -fini __gcc_fini \
+	  /usr/lib/crt1.o $(IRIX5_GCCLIB)/irix-crti.o $(IRIX5_GCCLIB)/crtbegin.o \
+	  -L$(IRIX5_GCCLIB) -L$(IRIX5_GCCLIB)/../../.. -L/usr/lib \
+	  $(CORE_OBJS) $(IRIX_OBJS) -lX11 -lm -lgcc -lgcc_eh -lc \
+	  $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
+
+# Tru64 ships no libXpm.  Set CC=gcc where that is what is installed.
+osf1:
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iosf1 -DNO_XPM" \
+	  LDFLAGS="-L/usr/shlib" LIBS="-lX11 -lm" \
+	  PLAT_OBJS="$(OSF1_OBJS)" $(TARGET)
+
+# OpenServer keeps X11R6 off the default paths and ships no libXpm.  The UDK
+# C driver at /udk/usr/ccs/bin/cc works too if that is what is installed.
+osr6:
+	$(MAKE) CFLAGS="$(CFLAGS) -Iosr6 -DNO_XPM -I/usr/X11R6/include" \
+	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lmas -lsocket -lnsl -lm" \
+	  PLAT_OBJS="$(OSR6_OBJS)" $(TARGET)
+
+# UnixWare ships no libXpm.  The UDK C driver is at /usr/ccs/bin/cc.
+unixware:
+	$(MAKE) CFLAGS="$(CFLAGS) -Iunixware -DNO_XPM" \
+	  LIBS="-lX11 -lmas -lelf -lsocket -lnsl -lm" \
+	  PLAT_OBJS="$(UNIXWARE_OBJS)" $(TARGET)
 
 clean:
-		rm -f xosview $(OBJS) $(DEPS) defaultstring.c
+	rm -f $(TARGET) *.o */*.o */*/*.o defaultstring.c
 
--include $(DEPS)
+dist:
+	./mkdist $(VERSION)
+
+install: $(TARGET)
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)$(MANDIR)/man1
+	mkdir -p $(DESTDIR)$(XDGAPPSDIR)
+	mkdir -p $(DESTDIR)$(ICONDIR)/32x32/apps
+	cp $(TARGET) $(DESTDIR)$(BINDIR)/$(TARGET)
+	chmod 755 $(DESTDIR)$(BINDIR)/$(TARGET)
+	cp xosview.1 $(DESTDIR)$(MANDIR)/man1/xosview.1
+	cp xosview.desktop $(DESTDIR)$(XDGAPPSDIR)/xosview.desktop
+	cp xosview.png $(DESTDIR)$(ICONDIR)/32x32/apps/xosview.png
+
+.PHONY: all clean dist install linux gnu freebsd netbsd openbsd dragonflybsd \
+	sunos5 aix4 aix5 hpux9 hpux10 hpux11 irix5 irix65 osf1 osr6 unixware

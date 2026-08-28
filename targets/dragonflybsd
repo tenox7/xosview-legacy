@@ -1,3 +1,0 @@
-PLATFORM = bsd
-CPPFLAGS += -I/usr/pkg/include -I/usr/local/include
-LDLIBS += -lkvm -lkinfo -ldevstat -L/usr/pkg/lib -L/usr/local/lib

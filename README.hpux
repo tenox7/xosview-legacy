@@ -13,23 +13,22 @@
   Building
   --------
 
-    gmake
+    make
 
-  9.x builds targets/hpux9 (gcc 2.7), 10.x targets/hpux10 (gcc) and 11.x
-  targets/hpux11 (HP ANSI C).  Override with "gmake TARGET=hpux9".
+  9.x builds the hpux9 target, 10.x hpux10 and 11.x hpux11.  Name one to
+  override: "make hpux9".
 
-  The build needs GNU make 3.77 or newer.  The 3.75 that HP-UX 9 ships as
-  /usr/local/gnu/bin/gmake has neither ?= nor target specific variables and
-  will not parse the Makefile.
+  The bundled HP-UX make is enough; there is no need for gmake.
 
   HP-UX 11 notes
   --------------
 
   The compiler is the HP ANSI C compiler at /opt/ansic/bin/cc, which ships
-  alongside aCC; the bundled /usr/bin/cc is K&R only and will not do.  Set
-  CC=gcc where that is installed instead.  -Ae turns on the ANSI mode the
-  system headers want, and HP cc has no -MMD, so the target file clears
-  DEPFLAGS and the build does without header dependencies.
+  alongside aCC; the bundled /usr/bin/cc is K&R only and will not do.  Say
+  "make hpux11 CC=gcc" where that is installed instead.  -Ae turns on the
+  ANSI mode the system headers want.  10.20 has the compiler at the same
+  path.  9.x is the exception: its target force includes a compatibility
+  header, which HP cc cannot do, so it builds with gcc.
 
   HP-UX ships no libXpm, so the target builds with -DNO_XPM, and it keeps
   X11R6 off the default linker path.
