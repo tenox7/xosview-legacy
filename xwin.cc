@@ -392,10 +392,40 @@ std::cerr << "Function not implemented!\n";  //  BCG  FIXME  Need to make this.
 unsigned long XWin::allocColor( const char *name ){
   XColor exact, closest;
 
-  if ( XAllocNamedColor( display_, colormap(), name, &closest, &exact ) == 0 )
-    std::cerr <<"XWin::allocColor() : failed to alloc : " <<name <<std::endl;
+  if ( XAllocNamedColor( display_, colormap(), name, &closest, &exact ) )
+    return closest.pixel;
 
-  return exact.pixel;
+  //  Allocation fails on a colormap that is already full, which is the normal
+  //  state of an 8 bit display running a desktop, so settle for the nearest
+  //  colour that is in it rather than for an uninitialised pixel.
+  if ( !XParseColor( display_, colormap(), name, &exact ) ){
+    std::cerr <<"XWin::allocColor() : no such color : " <<name <<std::endl;
+    return BlackPixel( display_, screen() );
+  }
+
+  int ncells = DisplayCells( display_, screen() );
+  if ( ncells > 256 )
+    ncells = 256;
+
+  XColor cells[256];
+  for ( int i = 0 ; i < ncells ; i++ )
+    cells[i].pixel = i;
+  XQueryColors( display_, colormap(), cells, ncells );
+
+  unsigned long best = BlackPixel( display_, screen() );
+  double bestdist = -1.0;
+  for ( int i = 0 ; i < ncells ; i++ ){
+    double dr = (double)cells[i].red   - (double)exact.red;
+    double dg = (double)cells[i].green - (double)exact.green;
+    double db = (double)cells[i].blue  - (double)exact.blue;
+    double dist = dr * dr + dg * dg + db * db;
+    if ( bestdist < 0.0 || dist < bestdist ){
+      bestdist = dist;
+      best = cells[i].pixel;
+    }
+  }
+
+  return best;
 }
 //-----------------------------------------------------------------------------
 
