@@ -1,29 +1,20 @@
-//  
-//  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1994, 1995 by Mike Romberg ( romberg@fsl.noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
-#include "fieldmetergraph.h"
+#include "fieldmeter.h"
 
-class CPUMeter : public FieldMeterGraph {
-public:
-  CPUMeter( XOSView *parent );
-  ~CPUMeter( void );
+typedef struct {
+  FieldMeter f;
+  float cputime[2][5];
+  int cpuindex;
+} CPUMeter;
 
-  const char *name( void ) const { return "CPUMeter"; }
-  void checkevent( void );
-
-  void checkResources(void);
-protected:
-  float cputime_[2][5];
-  int cpuindex_;
-
-  void getcputime( void );
-private:
-};
+Meter *cpumeter_new(XOSView *parent);
 
 #endif

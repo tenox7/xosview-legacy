@@ -14,8 +14,8 @@ lawyer-type).  These files are:
 by various authors who have intentionally chosen to allow the user
 to choose between the BSD copyright or the GPL copyright.  These files
 are:
-  fieldmeterdecay.h
-  fieldmeterdecay.cc
+  fieldmeter.h
+  fieldmeter.c
   general.h
   netbsd/MeterMaker.h
   netbsd/MeterMaker.cc

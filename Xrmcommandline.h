@@ -4,12 +4,12 @@
 #include <X11/Xresource.h>
 
 static XrmOptionDescRec options[] = {
-//  For these options, try to use '+' to turn them on, and '-' to turn them
-//    off, even though this is different from the usual tradition of -foo
-//    turning on 'foo', which is off by default.  At least this way,
-//    it is self-consistent, and self-explanatory.
+/*  For these options, try to use '+' to turn them on, and '-' to turn them  */
+/*    off, even though this is different from the usual tradition of -foo  */
+/*    turning on 'foo', which is off by default.  At least this way,  */
+/*    it is self-consistent, and self-explanatory.  */
 
-//  General, X11 resources:
+/*  General, X11 resources:  */
 { "-display", "*display", XrmoptionSepArg, (caddr_t) NULL },
 { "-font", "*font", XrmoptionSepArg, (caddr_t) NULL },
 { "-title", "*title", XrmoptionSepArg, (caddr_t) NULL },
@@ -19,7 +19,7 @@ static XrmOptionDescRec options[] = {
 { "-vspacing", "*verticalSpacing", XrmoptionSepArg, (caddr_t) NULL },
 
 
-//  XOSView-specific resources:
+/*  XOSView-specific resources:  */
 { "-labels", "*labels", XrmoptionNoArg, "False" },
 { "+labels", "*labels", XrmoptionNoArg, "True" },
 { "-captions", "*captions", XrmoptionNoArg, "False" },
@@ -27,53 +27,53 @@ static XrmOptionDescRec options[] = {
 { "-usedlabels", "*usedlabels", XrmoptionNoArg, "False" },
 { "+usedlabels", "*usedlabels", XrmoptionNoArg, "True" },
 { "-samplesPerSec", "*samplesPerSec", XrmoptionSepArg, (caddr_t) NULL },
-//  CPU resources
+/*  CPU resources  */
 { "-cpu", "*cpu", XrmoptionNoArg, "False" },
 { "+cpu", "*cpu", XrmoptionNoArg, "True" },
 { "-cpus", "*cpuFormat", XrmoptionNoArg, "single" },
 { "+cpus", "*cpuFormat", XrmoptionNoArg, "all" },
-// Load resources
+/* Load resources  */
 { "-load", "*load", XrmoptionNoArg, "False" },
 { "+load", "*load", XrmoptionNoArg, "True" },
-// Memmeter resources
+/* Memmeter resources  */
 { "-mem", "*mem", XrmoptionNoArg, "False" },
 { "+mem", "*mem", XrmoptionNoArg, "True" },
-// Swapmeter resources
+/* Swapmeter resources  */
 { "-swap", "*swap", XrmoptionNoArg, "False" },
 { "+swap", "*swap", XrmoptionNoArg, "True" },
-// Batterymeter resources
+/* Batterymeter resources  */
 { "-battery", "*battery", XrmoptionNoArg, "False" },
 { "+battery", "*battery", XrmoptionNoArg, "True" },
-// Wirelessmeter resources
+/* Wirelessmeter resources  */
 { "-wireless", "*wireless", XrmoptionNoArg, "False" },
 { "+wireless", "*wireless", XrmoptionNoArg, "True" },
-//  GFX resources
+/*  GFX resources  */
 { "-gfx", "*gfx", XrmoptionNoArg, "False" },
 { "+gfx", "*gfx", XrmoptionNoArg, "True" },
 
-// Networkmeter resources
+/* Networkmeter resources  */
 { "-net", "*net", XrmoptionNoArg, "False" },
 { "+net", "*net", XrmoptionNoArg, "True" },
-//  Previously, network was overloaded to be the bandwidth and the
-//  on/off flag.  Now, we have -net for on/off, and networkBandwidth
-//  for bandwidth, with the alias networkBW, and network for backwards
-//  compatibility.
+/*  Previously, network was overloaded to be the bandwidth and the  */
+/*  on/off flag.  Now, we have -net for on/off, and networkBandwidth  */
+/*  for bandwidth, with the alias networkBW, and network for backwards  */
+/*  compatibility.  */
 { "-network", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 { "-networkBW", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 { "-networkBandwidth", "*netBandwidth", XrmoptionSepArg, (caddr_t) NULL },
 
-// Page Meter
+/* Page Meter  */
 { "-page", "*page", XrmoptionNoArg, "False" },
 { "+page", "*page", XrmoptionNoArg, "True" },
 { "-pagespeed", "*pageBandWidth", XrmoptionSepArg, (caddr_t) NULL },
 
 #if !defined(__hpux__) && !defined(__hpux)
-//  Disk Meter Options
+/*  Disk Meter Options  */
 { "-disk", "*disk", XrmoptionNoArg, "False" },
 { "+disk", "*disk", XrmoptionNoArg, "True" },
 #endif
 
-// Interrupt meter resources  --  all sorts of aliases.
+/* Interrupt meter resources  --  all sorts of aliases.  */
 { "-int", "*interrupts", XrmoptionNoArg, "False" },
 { "+int", "*interrupts", XrmoptionNoArg, "True" },
 { "-ints", "*interrupts", XrmoptionNoArg, "False" },
@@ -81,27 +81,27 @@ static XrmOptionDescRec options[] = {
 { "-interrupts", "*interrupts", XrmoptionNoArg, "False" },
 { "+interrupts", "*interrupts", XrmoptionNoArg, "True" },
 
-// Intrate meter resources, for platforms that support it.
+/* Intrate meter resources, for platforms that support it.  */
 { "-irqrate", "*irqrate", XrmoptionNoArg, "False" },
 { "+irqrate", "*irqrate", XrmoptionNoArg, "True" },
 { "-intrate", "*irqrate", XrmoptionNoArg, "False" },
 { "+intrate", "*irqrate", XrmoptionNoArg, "True" },
 
-// lmstemp resources
+/* lmstemp resources  */
 { "-lmstemp", "*lmstemp", XrmoptionNoArg, "False" },
 { "+lmstemp", "*lmstemp", XrmoptionNoArg, "True" },
-// coretemp resources
+/* coretemp resources  */
 { "-coretemp", "*coretemp", XrmoptionNoArg, "False" },
 { "+coretemp", "*coretemp", XrmoptionNoArg, "True" },
-// acpitemp resources
+/* acpitemp resources  */
 { "-acpitemp", "*acpitemp", XrmoptionNoArg, "False" },
 { "+acpitemp", "*acpitemp", XrmoptionNoArg, "True" },
 
-//  Special, catch-all option here --
-//    xosview -xrm "*memFreeColor: purple" should work, for example.
+/*  Special, catch-all option here --  */
+/*    xosview -xrm "*memFreeColor: purple" should work, for example.  */
 { "-xrm", "*xrm", XrmoptionResArg, (caddr_t) NULL },
 };
-//  This auto-detects changes in the number of options.
+/*  This auto-detects changes in the number of options.  */
 static const int NUM_OPTIONS = sizeof(options) / sizeof(options[0]);
 
 #endif

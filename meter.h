@@ -1,63 +1,61 @@
-//
-//  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
-//
-//  This file may be distributed under terms of the GPL
-//
+/*
+ *  Copyright (c) 1994, 1995, 2006 by Mike Romberg ( mike.romberg@noaa.gov )
+ *
+ *  This file may be distributed under terms of the GPL
+ */
 
 #ifndef _METER_H_
 #define _METER_H_
 
-#include "xosview.h"
-#include <iostream>
+#include "fwd.h"
+#include <stddef.h>
 
+/*
+ *  The base of every meter.  Concrete meters embed this as their first
+ *  member, so a pointer to one is also a pointer to the other, and the
+ *  four hooks below take the place of the C++ virtual functions.
+ */
+struct Meter {
+  XOSView *parent;
+  XWin *xw;             /*  == (XWin *)parent; saves a cast at every use  */
+  const char *name;     /*  static string, named in warning messages  */
+  char *title;
+  char *legend;
+  int x, y, width, height;
+  int docaptions, dolegends, dousedlegends;
+  int priority, counter;
+  unsigned long textcolor;
 
-class Meter {
-public:
-  Meter( XOSView *parent, const char *title = "", const char *legend ="",
-	 int docaptions = 0, int dolegends = 0, int dousedlegends = 0 );
-  virtual ~Meter( void );
-
-  virtual const char *name( void ) const { return "Meter"; }
-  void resize( int x, int y, int width, int height );
-  virtual void checkevent( void ) = 0;
-  virtual void draw( void ) = 0;
-  void title( const char *title );
-  const char *title( void ) { return title_; }
-  void legend( const char *legend );
-  const char *legend( void ) { return legend_; }
-  void docaptions( int val ) { docaptions_ = val; }
-  void dolegends( int val ) { dolegends_ = val; }
-  void dousedlegends( int val ) { dousedlegends_ = val; }
-  int requestevent( void ){
-    if (priority_ == 0) {
-      std::cerr << "Warning:  meter " << name() << " had an invalid priority "
-                << "of 0. Resetting to 1..." << std::endl;
-      priority_ = 1;
-    }
-    int rval = counter_ % priority_;
-    counter_ = (counter_ + 1) % priority_;
-    return !rval;
-  }
-
-  int getX() const { return x_; }
-  int getY() const { return y_; }
-  int getWidth() const { return width_; }
-  int getHeight() const { return height_; }
-
-  virtual void checkResources( void );
-
-  static double scaleValue( double value, char *scale, bool metric );
-
-protected:
-  XOSView *parent_;
-  int x_, y_, width_, height_, docaptions_, dolegends_, dousedlegends_;
-  int priority_, counter_;
-  char *title_, *legend_;
-  unsigned long textcolor_;
-  double samplesPerSecond() { return 1.0*MAX_SAMPLES_PER_SECOND/priority_; }
-  double secondsPerSample() { return 1.0/samplesPerSecond(); }
-
-private:
+  void (*checkevent)(Meter *m);
+  void (*checkres)(Meter *m);
+  void (*draw)(Meter *m);
+  void (*destroy)(Meter *m);   /*  frees the meter's own memory, not itself  */
 };
+
+void meter_init(Meter *m, XOSView *parent, const char *name,
+                const char *title, const char *legend,
+                int docaptions, int dolegends, int dousedlegends);
+void meter_fini(Meter *m);
+
+void meter_settitle(Meter *m, const char *title);
+void meter_setlegend(Meter *m, const char *legend);
+void meter_resize(Meter *m, int x, int y, int width, int height);
+void meter_checkresources(Meter *m);
+int meter_requestevent(Meter *m);
+
+double meter_samplespersecond(const Meter *m);
+double meter_secondspersample(const Meter *m);
+
+double meter_scalevalue(double value, char *scale, int metric);
+
+/*  How the "used" label is formatted.  Shared by FieldMeter and
+ *  BitFieldMeter, which format it identically.  */
+enum UsedType { UT_FLOAT, UT_PERCENT, UT_AUTOSCALE };
+
+void *meter_alloc(size_t n);   /*  malloc that exits on failure  */
+
+int meter_parseusedformat(const char *fmt);
+void meter_formatused(char *buf, size_t bufsize, int print, double used,
+                      int metric);
 
 #endif

@@ -36,25 +36,20 @@ OPTFLAGS ?= -Wall -O3
 
 XPMLIB ?= -lXpm
 
-# Compilers other than gcc spell these differently; see targets/hpux11
+# Compilers other than gcc spell this differently; see targets/hpux11
 
 DEPFLAGS ?= -MMD
-NOWRITESTRINGS ?= -Wno-write-strings
 
 # Required build arguments
 
 CPPFLAGS += $(OPTFLAGS) -I. $(DEPFLAGS)
 LDLIBS += -lX11 $(XPMLIB)
 
-OBJS = Host.o \
-	Xrm.o \
+OBJS = Xrm.o \
 	bitfieldmeter.o \
 	bitmeter.o \
 	defaultstring.o \
 	fieldmeter.o \
-	fieldmeterdecay.o \
-	fieldmetergraph.o \
-	llist.o \
 	main.o \
 	meter.o \
 	stringutils.o \
@@ -183,7 +178,7 @@ OBJS += sunos5/MeterMaker.o \
         sunos5/pagemeter.o \
         sunos5/swapmeter.o \
         sunos5/intratemeter.o
-CPPFLAGS += -Isunos5/ -Wno-write-strings
+CPPFLAGS += -Isunos5/
 LDLIBS += -lkstat -lnsl -lsocket
 INSTALL = ginstall
 endif
@@ -227,23 +222,15 @@ endif
 #  than next to the object, and is too old to have -MF, so look for both names.
 DEPS := $(OBJS:.o=.d) $(notdir $(OBJS:.o=.d))
 
-#  HP-UX keeps template implementations in a .cc next to the extension-less
-#  standard headers, so make's builtin "program out of a source file" rule
-#  tries to remake <limits> from limits.cc when a .d file names it.
-%: %.cc
-%: %.o
-
 #  Toolchains that can not drive the linker themselves override this; see
 #  targets/irix5.
-LINK ?= $(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+LINK ?= $(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 xosview:	$(OBJS)
 		$(LINK)
 
-defaultstring.cc:	Xdefaults defresources.awk
-		$(AWK) -f defresources.awk Xdefaults > defaultstring.cc
-
-Xrm.o:		CXXFLAGS += $(NOWRITESTRINGS)
+defaultstring.c:	Xdefaults defresources.awk
+		$(AWK) -f defresources.awk Xdefaults > defaultstring.c
 
 .PHONY:		dist install clean
 
@@ -261,6 +248,6 @@ install:	xosview
 		$(INSTALL) -m 644 xosview.png $(DESTDIR)$(ICONDIR)/32x32/apps
 
 clean:
-		rm -f xosview $(OBJS) $(DEPS) defaultstring.cc
+		rm -f xosview $(OBJS) $(DEPS) defaultstring.c
 
 -include $(DEPS)

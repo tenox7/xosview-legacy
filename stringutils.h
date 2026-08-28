@@ -3,9 +3,8 @@
 
 #include <stdlib.h>
 
-/** Like snprintf, except that instead of truncating the string, it
- * will print an error message and abort().
- */
-void snprintf_or_abort(char* str, size_t size, const char* format, ...);
+/*  Like snprintf, except that instead of truncating the string, it
+ *  prints an error message and abort()s.  */
+void snprintf_or_abort(char *str, size_t size, const char *format, ...);
 
 #endif
