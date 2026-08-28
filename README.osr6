@@ -1,0 +1,45 @@
+
+  The SCO OpenServer 6 port provides these meters:
+
+    - load meter
+    - cpu meter:  user | system | io-wait | idle
+    - mem meter:  used | free
+    - swap meter: used | free
+
+  None of them need any privileges.
+
+  Building
+  --------
+
+    gmake
+
+  targets/osr6 builds with gcc; the UDK C++ driver at /udk/usr/ccs/bin/CC
+  works too if that is what is installed.  OpenServer ships no libXpm, so
+  the target builds with -DNO_XPM, which drops support for the pixmapName
+  resource and leaves everything else intact.
+
+  Where the numbers come from
+  ---------------------------
+
+  Everything goes through the small interface in osr6/osr6stats.h.  The cpu
+  counters and free memory come from the MAS metric file that sar(1) and
+  top read, and swap from swapctl(2).
+
+  Two quirks are worth knowing about.  The kernel publishes free memory as
+  an accumulator rather than a level, so the mem meter reads zero free for
+  its first sample and is correct from the second on.  And it keeps
+  freefilemem identical to freemem, so the file cache cannot be shown as a
+  field of its own the way it is on other platforms.
+
+  The load meter is not a kernel figure at all: avenrun exists as a symbol
+  but is never updated, which is why uptime(1) always prints 0.00.  The
+  meter samples the run queue out of /proc instead and decays those samples
+  into a 1 minute average itself, so it needs a minute of running before it
+  settles.
+
+  Untested
+  --------
+
+  This port has not yet been built or run on real hardware.
+
+  OpenServer 5 is not supported: it has no MAS.

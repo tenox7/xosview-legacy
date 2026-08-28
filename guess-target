@@ -4,6 +4,7 @@
 
 s=`uname -s`
 r=`uname -r`
+v=`uname -v`
 t=
 
 case "$s" in
@@ -15,6 +16,8 @@ case "$s" in
   OpenBSD)     t=openbsd ;;
   DragonFly)   t=dragonflybsd ;;
   IRIX|IRIX64) t=irix65 ;;
+  #  Only OpenServer 6 is supported; uname -v is what separates it from 5.
+  SCO_SV)      case "$v" in 6.*) t=osr6 ;; esac ;;
   SunOS)       case "$r" in 5.*) t=sunos5 ;; esac ;;
   #  libperfstat arrived in AIX 5.1 and is exactly what decides the back end,
   #  so test for it rather than picking apart uname.

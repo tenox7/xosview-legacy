@@ -147,6 +147,18 @@ XPMLIB =
 LDLIBS += -lm
 endif
 
+ifeq ($(PLATFORM), osr6)
+OBJS += osr6/MeterMaker.o \
+        osr6/cpumeter.o \
+        osr6/loadmeter.o \
+        osr6/memmeter.o \
+        osr6/osr6stats.o \
+        osr6/swapmeter.o
+CPPFLAGS += -Iosr6/ -DNO_XPM
+XPMLIB =
+LDLIBS += -lmas -lsocket -lnsl -lm
+endif
+
 ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \
