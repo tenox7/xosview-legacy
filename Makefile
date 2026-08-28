@@ -171,6 +171,7 @@ endif
 ifeq ($(PLATFORM), sunos5)
 OBJS += sunos5/MeterMaker.o \
         sunos5/cpumeter.o \
+        sunos5/kstats.o \
         sunos5/diskmeter.o \
         sunos5/loadmeter.o \
         sunos5/memmeter.o \

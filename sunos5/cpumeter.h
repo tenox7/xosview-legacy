@@ -1,37 +1,26 @@
-//  
-//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
-//
+/*
+ *  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
+ */
+
 #ifndef _CPUMETER_H_
 #define _CPUMETER_H_
 
-#include "fieldmetergraph.h"
-#include "xosview.h"
+#include "fieldmeter.h"
 #include "kstats.h"
 #include <kstat.h>
 #include <sys/sysinfo.h>
 
-
-class CPUMeter : public FieldMeterGraph {
- public:
-	CPUMeter(XOSView *parent, kstat_ctl_t *kcp, int cpuid = 0);
-	~CPUMeter(void);
-
-	const char *name(void) const { return "CPUMeter"; }
-	void checkevent(void);
-	void checkResources(void);
-	static const char *cpuStr(int num);
-
- protected:
-	float cputime_[2][CPU_STATES];
-	int cpuindex_;
-
-	void getcputime(void);
-
- private:
+typedef struct {
+	FieldMeter f;
+	float cputime[2][CPU_STATES];
+	int cpuindex;
 	KStatList *cpustats;
-	bool aggregate;
+	int aggregate;
 	kstat_ctl_t *kc;
 	kstat_t *ksp;
-};
+} CPUMeter;
+
+/*  A cpuid below zero aggregates every processor into one meter.  */
+Meter *cpumeter_new(XOSView *parent, kstat_ctl_t *kc, int cpuid);
 
 #endif

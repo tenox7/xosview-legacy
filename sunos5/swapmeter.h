@@ -1,29 +1,19 @@
-//  
-//  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
-//
+/*
+ *  Initial port performed by Greg Onufer (exodus@cheers.bungi.com)
+ */
+
 #ifndef _SWAPMETER_H_
 #define _SWAPMETER_H_
 
-#include "fieldmetergraph.h"
-#include "xosview.h"
+#include "fieldmeter.h"
 #include <kstat.h>
+#include <stddef.h>
 
-
-class SwapMeter : public FieldMeterGraph {
- public:
-	SwapMeter(XOSView *parent, kstat_ctl_t *kcp);
-	~SwapMeter(void);
-
-	const char *name(void) const { return "SwapMeter"; }  
-	void checkevent(void);
-	void checkResources(void);
-
- protected:
-	void getswapinfo(void);
-
- private:
+typedef struct {
+	FieldMeter f;
 	size_t pagesize;
-};
+} SwapMeter;
 
+Meter *swapmeter_new(XOSView *parent, kstat_ctl_t *kc);
 
 #endif

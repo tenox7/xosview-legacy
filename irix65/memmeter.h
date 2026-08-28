@@ -1,34 +1,22 @@
-//  
-//  Initial port performed by Stefan Eilemann (eilemann@gmail.com)
-//
+/*
+ *  Initial port performed by Stefan Eilemann (eilemann@gmail.com)
+ */
+
 #ifndef _MEMMETER_H_
 #define _MEMMETER_H_
 
-#include "fieldmetergraph.h"
+#include "fieldmeter.h"
 #include <sys/types.h>
 #include <sys/sysmp.h>
-#include <sys/sysinfo.h> /* for SAGET and MINFO structures */
+#include <sys/sysinfo.h>  /*  for SAGET and MINFO structures  */
 
-class MemMeter : public FieldMeterGraph {
- public:
-	MemMeter(XOSView *parent);
-	~MemMeter(void);
+typedef struct {
+    FieldMeter f;
+    int pageSize;
+    struct rminfo mp;
+    int minfosz;
+} MemMeter;
 
-	const char *name(void) const { return "MemMeter"; }  
-	void checkevent( void );
-
-	void checkResources(void);
-
- protected:
-	//  struct pst_status *stats_;
-	int _pageSize;
-
-	void getmeminfo( void );
-
- private:
-    struct rminfo  mp;
-    int            minfosz;
-};
-
+Meter *memmeter_new(XOSView *parent);
 
 #endif
