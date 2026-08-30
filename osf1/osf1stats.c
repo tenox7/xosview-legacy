@@ -17,11 +17,6 @@
 #include <mach/vm_statistics.h>
 #include <unistd.h>
 
-/*  TBL_SWAPINFO reports partition sizes in 512 byte blocks.  If the swap
- *  meter comes out scaled wrong on some release, this is the constant to
- *  correct.  */
-#define SWAPBLOCK 512.0
-
 static int vmstats(vm_statistics_data_t *vms) {
   return vm_statistics(task_self(), vms) == KERN_SUCCESS;
 }
@@ -77,15 +72,18 @@ int osf1stats_memory(double *totalp, double *cachep, double *freep) {
 }
 
 int osf1stats_swap(double *totalp, double *freep) {
-  struct swapinfo swi;
+  struct tbl_swapinfo swi;
+  double pagesize = getpagesize();
   int i;
 
   *totalp = *freep = 0;
 
-  /*  One entry per swap partition, walked until the call runs out of them. */
+  /*  One entry per swap partition, walked until the call runs out of them.
+   *  Both counts are in pages, not in the 512 byte blocks the rest of
+   *  table(2) reports in.  */
   for (i = 0; table(TBL_SWAPINFO, i, &swi, 1, sizeof(swi)) > 0; i++) {
-    *totalp += (double)swi.si_swapsize * SWAPBLOCK;
-    *freep += (double)swi.si_free * SWAPBLOCK;
+    *totalp += (double)swi.size * pagesize;
+    *freep += (double)swi.free * pagesize;
   }
 
   return i > 0;
