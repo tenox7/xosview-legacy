@@ -1,15 +1,12 @@
-xosview
-=======
+xosview legacy
+==============
 
-This version is distributed from:
+A rewrite of xosview 1.x in plain and portable C.
+
+Derived from:
 
   http://www.pogo.org.uk/~mark/xosview/
   https://github.com/hills/xosview
-
-The source is C: C89 for the vendor Unix ports, which is all their
-compilers accept, and whatever the local gcc or clang takes for Linux
-and the BSDs.
-
 
 Building
 --------
