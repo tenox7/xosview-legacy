@@ -9,8 +9,9 @@
 
 /*
  *  The meters read every statistic through this interface, implemented in
- *  osf1/osf1stats.c on top of table(2) and the Mach vm_statistics() call.
- *  Neither needs any privileges.
+ *  osf1/osf1stats.c on top of table(2), the Mach vm_statistics() call and,
+ *  for the interface counters alone, /dev/kmem.  Only that last one needs
+ *  any privileges.
  *
  *  Every call returns 0 when its statistic can not be obtained.  Meters
  *  disable themselves in that case rather than fail to start, so a kernel
@@ -35,6 +36,19 @@ int osf1stats_swap(double *totalp, double *freep);
 
 /*  Cumulative pages paged in and out.  */
 int osf1stats_paging(double *inp, double *outp);
+
+/*  Cumulative bytes transferred over every disk.  The kernel counts each
+ *  transfer without recording its direction, so reads and writes arrive
+ *  here already added together.  */
+int osf1stats_disk(double *bytesp);
+
+/*  Cumulative bytes received and sent.  iface names a single interface to
+ *  report on, or is null to total every interface; when ignore is set the
+ *  named interface is the only one left out.  */
+int osf1stats_net(const char *iface, int ignore, double *inp, double *outp);
+
+/*  Cumulative device interrupts, which excludes the clock.  */
+int osf1stats_intr(double *countp);
 
 /*  Processors online, at least 1.  */
 int osf1stats_cpus(void);

@@ -48,8 +48,9 @@ HPUX_OBJS = hpux/MeterMaker.o hpux/cpumeter.o hpux/loadmeter.o \
 IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/diskmeter.o \
 	irix65/loadmeter.o irix65/memmeter.o irix65/sarmeter.o
 
-OSF1_OBJS = osf1/MeterMaker.o osf1/cpumeter.o osf1/loadmeter.o \
-	osf1/memmeter.o osf1/osf1stats.o osf1/pagemeter.o osf1/swapmeter.o
+OSF1_OBJS = osf1/MeterMaker.o osf1/cpumeter.o osf1/diskmeter.o \
+	osf1/intratemeter.o osf1/loadmeter.o osf1/memmeter.o osf1/netmeter.o \
+	osf1/osf1stats.o osf1/pagemeter.o osf1/swapmeter.o
 
 OSR6_OBJS = osr6/MeterMaker.o osr6/cpumeter.o osr6/loadmeter.o \
 	osr6/memmeter.o osr6/osr6stats.o osr6/swapmeter.o
@@ -102,7 +103,7 @@ defaultstring.c: Xdefaults defresources.awk
 	$(AWK) -f defresources.awk Xdefaults > defaultstring.c
 
 # linux/coretemp.c and bsd/coretemp.c read x86 MSRs and build there only.
-linux: FORCE
+linux::
 	@case `uname -m` in \
 	  *86*) x=linux/coretemp.o;; \
 	  *) x=;; \
@@ -110,11 +111,11 @@ linux: FORCE
 	$(MAKE) CFLAGS="$(CFLAGS) -Ilinux" LIBS="-lX11 -lXpm -lm" \
 	  PLAT_OBJS="$(LINUX_OBJS) $$x" $(TARGET)
 
-gnu: FORCE
+gnu::
 	$(MAKE) CFLAGS="$(CFLAGS) -Ignu" LIBS="-lX11 -lXpm" \
 	  PLAT_OBJS="$(GNU_OBJS)" $(TARGET)
 
-freebsd: FORCE
+freebsd::
 	@case `uname -m` in \
 	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
 	  *) x=;; \
@@ -123,7 +124,7 @@ freebsd: FORCE
 	  LDFLAGS="-L/usr/local/lib" LIBS="-lX11 -lXpm -ldevstat -lkvm -lm" \
 	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-netbsd: FORCE
+netbsd::
 	@case `uname -m` in \
 	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
 	  *) x=;; \
@@ -133,7 +134,7 @@ netbsd: FORCE
 	  LIBS="-lX11 -lXpm -lkvm -lprop -lm" \
 	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-openbsd: FORCE
+openbsd::
 	@case `uname -m` in \
 	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
 	  *) x=;; \
@@ -142,7 +143,7 @@ openbsd: FORCE
 	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lXpm -lkvm -lm" \
 	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-dragonflybsd: FORCE
+dragonflybsd::
 	@case `uname -m` in \
 	  i386|amd64|x86_64) x=bsd/coretemp.o;; \
 	  *) x=;; \
@@ -152,7 +153,7 @@ dragonflybsd: FORCE
 	  LIBS="-lX11 -lXpm -lkvm -lkinfo -ldevstat -lm" \
 	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
-sunos5: FORCE
+sunos5::
 	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Isunos5" \
 	  LIBS="-lX11 -lXpm -lkstat -lnsl -lsocket" \
 	  PLAT_OBJS="$(SUNOS5_OBJS)" $(TARGET)
@@ -160,11 +161,11 @@ sunos5: FORCE
 # AIX ships no libXpm; only the pixmapName resource is lost with -DNO_XPM.
 # 4.x predates libperfstat, so the statistics come out of kernel memory, and
 # its headers declare neither snprintf nor the strcasecmp family.
-aix4: FORCE
+aix4::
 	$(MAKE) CFLAGS="$(CFLAGS) -Iaix -DNO_XPM -include aix/aixcompat.h" \
 	  LIBS="-lX11 -lm" PLAT_OBJS="$(AIX_OBJS) aix/kmem.o" $(TARGET)
 
-aix5: FORCE
+aix5::
 	$(MAKE) CFLAGS="$(CFLAGS) -Iaix -DNO_XPM" \
 	  LIBS="-lX11 -lm -lperfstat" \
 	  PLAT_OBJS="$(AIX_OBJS) aix/perfstat.o" $(TARGET)
@@ -177,7 +178,7 @@ HPUX_CC = /opt/ansic/bin/cc
 # routines its headers never declare; hpux/hpux9 makes up the difference.
 # That shim is force included, which HP cc cannot do, so this one target
 # wants gcc rather than the ANSI C compiler the other two use.
-hpux9: FORCE
+hpux9::
 	$(MAKE) CC=gcc \
 	  CFLAGS="$(CFLAGS) -Ihpux -Ihpux/hpux9 -I/usr/include/X11R5 \
 	    -DNO_PSS_NBLKSENABLED -include hpux/hpux9/compat.h" \
@@ -185,19 +186,19 @@ hpux9: FORCE
 	  PLAT_OBJS="$(HPUX_OBJS) hpux/hpux9/compat.o" $(TARGET)
 
 # 10.20 keeps X11R6 off the default paths and ships no libXpm.
-hpux10: FORCE
+hpux10::
 	$(MAKE) CC=$(HPUX_CC) \
 	  CFLAGS="-Ae -O -I. -Ihpux -DNO_XPM -I/usr/include/X11R6 \
 	    -I/usr/contrib/X11R6/include" \
 	  LDFLAGS="-L/usr/lib/X11R6 -L/usr/contrib/X11R6/lib" LIBS="-lX11" \
 	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
 
-hpux11: FORCE
+hpux11::
 	$(MAKE) CC=$(HPUX_CC) CFLAGS="-Ae +O3 -I. -Ihpux -DNO_XPM" \
 	  LDFLAGS="-L/usr/lib/X11R6" LIBS="-lX11" \
 	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
 
-irix65: FORCE
+irix65::
 	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iirix65" LIBS="-lX11 -lXpm" \
 	  PLAT_OBJS="$(IRIX_OBJS) irix65/gfxmeter.o" $(TARGET)
 
@@ -209,7 +210,7 @@ IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
 # named by hand.  Correct the two paths above to match what is installed.
 # gcc fakes _COMPILER_VERSION, which makes SGI's offsetof() reach for the
 # MIPSpro builtin __INTADDR__ that gcc does not have.
-irix5: FORCE
+irix5::
 	$(MAKE) $(CORE_OBJS) $(IRIX_OBJS) \
 	  CFLAGS="$(CFLAGS) -Iirix65 -DIRIX5 -DNO_XPM -isystem /usr/include \
 	    -U_COMPILER_VERSION"
@@ -220,20 +221,20 @@ irix5: FORCE
 	  $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
 
 # Tru64 ships no libXpm.  Set CC=gcc where that is what is installed.
-osf1: FORCE
+osf1::
 	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iosf1 -DNO_XPM" \
 	  LDFLAGS="-L/usr/shlib" LIBS="-lX11 -lm -lmach" \
 	  PLAT_OBJS="$(OSF1_OBJS)" $(TARGET)
 
 # OpenServer keeps X11R6 off the default paths and ships no libXpm.  The UDK
 # C driver at /udk/usr/ccs/bin/cc works too if that is what is installed.
-osr6: FORCE
+osr6::
 	$(MAKE) CFLAGS="$(CFLAGS) -Iosr6 -DNO_XPM -I/usr/X11R6/include" \
 	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lmas -lsocket -lnsl -lm" \
 	  PLAT_OBJS="$(OSR6_OBJS)" $(TARGET)
 
 # UnixWare ships no libXpm.  The UDK C driver is at /usr/ccs/bin/cc.
-unixware: FORCE
+unixware::
 	$(MAKE) CFLAGS="$(CFLAGS) -Iunixware -DNO_XPM" \
 	  LIBS="-lX11 -lmas -lelf -lsocket -lnsl -lm" \
 	  PLAT_OBJS="$(UNIXWARE_OBJS)" $(TARGET)
@@ -241,7 +242,7 @@ unixware: FORCE
 clean:
 	rm -f $(TARGET) *.o */*.o */*/*.o defaultstring.c
 
-dist:
+dist::
 	./mkdist $(VERSION)
 
 install: $(TARGET)
@@ -255,10 +256,10 @@ install: $(TARGET)
 	cp xosview.desktop $(DESTDIR)$(XDGAPPSDIR)/xosview.desktop
 	cp xosview.png $(DESTDIR)$(ICONDIR)/32x32/apps/xosview.png
 
+# The vendor makes ignore .PHONY, and linux, gnu, sunos5, irix65, osf1, osr6,
+# unixware and dist each name a directory as well as a target, which then
+# always looks up to date.  A double colon rule with no prerequisites is the
+# one form POSIX says always runs.
 .PHONY: all clean dist install linux gnu freebsd netbsd openbsd dragonflybsd \
 	sunos5 aix4 aix5 hpux9 hpux10 hpux11 irix5 irix65 osf1 osr6 unixware
 
-# The vendor makes ignore .PHONY, and linux, gnu, sunos5, irix65, osf1, osr6
-# and unixware each name a source directory as well as a target, which then
-# always looks up to date.  A prerequisite that can never exist forces them.
-FORCE:

@@ -149,20 +149,36 @@ union instead, which -DNO_PSS_NBLKSENABLED selects.
 Tru64 UNIX
 ----------
 
-Meters: load, cpu, mem, swap and page, none needing privileges.  Covers
-Tru64 UNIX, Digital UNIX and OSF/1.
+Meters: load, cpu, mem, swap, page, disk, net and irqrate.  Covers Tru64
+UNIX, Digital UNIX and OSF/1.  Only the net meter needs privileges.
 
-Load, cpu and swap come from table(2) -- TBL_LOADAVG, TBL_SYSINFO and
-TBL_SWAPINFO -- and memory and paging from the Mach vm_statistics()
-call.  The mem meter shows the inactive queue as cache, where the
-unified buffer cache parks clean file pages; wired UBC pages land under
-used, which reads high during heavy file i/o.  The page meter counts
-every page fault serviced from disk, as vm_statistics() does not
-separate swap from file paging.
+Load, cpu, swap, disk and interrupts come from table(2) -- TBL_LOADAVG,
+TBL_SYSINFO, TBL_SWAPINFO, TBL_DKINFO and TBL_INTR -- and memory and
+paging from the Mach vm_statistics() call.  The mem meter shows the
+inactive queue as cache, where the unified buffer cache parks clean file
+pages; wired UBC pages land under used, which reads high during heavy
+file i/o.  The page meter counts every page fault serviced from disk, as
+vm_statistics() does not separate swap from file paging.
 
-Untested on real hardware.  The likeliest thing to need correcting is
-the unit TBL_SWAPINFO reports partition sizes in; osf1/osf1stats.c
-assumes 512 byte blocks and names the constant SWAPBLOCK.
+The disk meter reports the iostat(1) counters.  The kernel totals the
+bytes each drive moves without recording their direction, so this meter
+has one traffic field, coloured with diskUsedColor, in place of the
+separate reads and writes the other ports show.  TBL_INTR likewise keeps
+one machine wide count with no per vector breakdown, so there is an
+irqrate meter but no interrupt meter, and the clock is left out of it.
+
+The interface counters have no system call of their own and are read out
+of /dev/kmem at the address nlist() resolves for ifnet in /vmunix.  That
+is mode 0440 root:mem, so the net meter needs root, or:
+
+  chgrp mem /usr/local/bin/xosview
+  chmod 2755 /usr/local/bin/xosview
+
+Without it the net meter disables itself and the rest still runs.  Those
+counters are 32 bit and wrap on a busy link; a sample that moves
+backwards is skipped rather than plotted as a spike.
+
+Tested on Digital UNIX 4.0G.
 
 
 SCO OpenServer 6
