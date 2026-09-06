@@ -190,12 +190,12 @@ hpux10::
 	$(MAKE) CC=$(HPUX_CC) \
 	  CFLAGS="-Ae -O -I. -Ihpux -DNO_XPM -I/usr/include/X11R6 \
 	    -I/usr/contrib/X11R6/include" \
-	  LDFLAGS="-L/usr/lib/X11R6 -L/usr/contrib/X11R6/lib" LIBS="-lX11" \
+	  LDFLAGS="-L/usr/lib/X11R6 -L/usr/contrib/X11R6/lib" LIBS="-lX11 -lm" \
 	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
 
 hpux11::
 	$(MAKE) CC=$(HPUX_CC) CFLAGS="-Ae +O3 -I. -Ihpux -DNO_XPM" \
-	  LDFLAGS="-L/usr/lib/X11R6" LIBS="-lX11" \
+	  LDFLAGS="-L/usr/lib/X11R6" LIBS="-lX11 -lm" \
 	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
 
 irix65::
