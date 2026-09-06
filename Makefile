@@ -234,9 +234,10 @@ osr6::
 	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lmas -lsocket -lnsl -lm" \
 	  PLAT_OBJS="$(OSR6_OBJS)" $(TARGET)
 
-# UnixWare ships no libXpm.  The UDK C driver is at /usr/ccs/bin/cc.
+# UnixWare ships no libXpm.  cc is the UDK C driver at /usr/ccs/bin/cc.
+# Set CC=gcc where that is what is installed.
 unixware::
-	$(MAKE) CFLAGS="$(CFLAGS) -Iunixware -DNO_XPM" \
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iunixware -DNO_XPM" \
 	  LIBS="-lX11 -lmas -lelf -lsocket -lnsl -lm" \
 	  PLAT_OBJS="$(UNIXWARE_OBJS)" $(TARGET)
 

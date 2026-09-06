@@ -212,7 +212,3 @@ or:
   chmod 2755 /usr/local/bin/xosview
 
 Without it the load meter disables itself and the rest still runs.
-
-Untested on real hardware.  The MAS metrics are the likeliest thing to
-need work: the sister sng project reads cpu the same way here but never
-got memory out of MAS, so FREEMEM may need a different metric id.

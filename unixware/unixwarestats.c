@@ -12,6 +12,7 @@
 
 #include <sys/types.h>
 #include <sys/param.h>
+#include <sys/dl.h>
 #include <sys/swap.h>
 #include <fcntl.h>
 #include <nlist.h>
