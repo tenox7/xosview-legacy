@@ -226,10 +226,11 @@ osf1::
 	  LDFLAGS="-L/usr/shlib" LIBS="-lX11 -lm -lmach" \
 	  PLAT_OBJS="$(OSF1_OBJS)" $(TARGET)
 
-# OpenServer keeps X11R6 off the default paths and ships no libXpm.  The UDK
-# C driver at /udk/usr/ccs/bin/cc works too if that is what is installed.
+# OpenServer keeps X11R6 off the default paths and ships no libXpm.  cc is
+# the UDK C driver, also installed as /udk/usr/ccs/bin/cc.  Set CC=gcc where
+# that is what is installed.
 osr6::
-	$(MAKE) CFLAGS="$(CFLAGS) -Iosr6 -DNO_XPM -I/usr/X11R6/include" \
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iosr6 -DNO_XPM -I/usr/X11R6/include" \
 	  LDFLAGS="-L/usr/X11R6/lib" LIBS="-lX11 -lmas -lsocket -lnsl -lm" \
 	  PLAT_OBJS="$(OSR6_OBJS)" $(TARGET)
 
