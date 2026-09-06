@@ -196,8 +196,6 @@ exists but is never updated, which is why uptime(1) always prints 0.00,
 so the load meter samples the run queue out of /proc and decays those
 into a 1 minute average itself; it needs a minute to settle.
 
-Untested on real hardware.
-
 
 UnixWare 7
 ----------
