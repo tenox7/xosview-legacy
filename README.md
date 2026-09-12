@@ -107,9 +107,9 @@ chmod 2755 /usr/local/bin/xosview
 
 Without it the net meter disables itself and the rest still runs.  Those
 counters are 32 bit and wrap on a busy link; a sample that moves
-backwards is skipped rather than plotted as a spike.  A 6.5 kernel's
-pointers do not fit the n32 objects cc builds there, so the net meter is
-built for 5.3 only.
+backwards is skipped rather than plotted as a spike.  This meter is 5.3
+only: 6.5 ships `nlist()` in the o32 libmld alone, which the n32 objects
+cc builds there cannot link, and it moved the counters into `if_data`.
 
 The irix5 target builds the same meters for 5.3 minus the gfx meter,
 which needs the 6.5 graphics pipe interface, and its mem meter's file
@@ -117,8 +117,9 @@ system field is just the buffer cache, as 5.3 predates the chunk
 allocator.  5.3 has neither snprintf nor usleep, which irix65/irix5
 supplies, and it needs gcc: IRIX5_CC, IRIX5_GCCLIB and IRIX5_LD at the
 top of that target name the tgcware toolchain and the hand written link
-line it wants.  Tested on IP22; the meters added to both releases are
-untested on 6.5.
+line it wants.
+
+Both targets are tested on IP22, 5.3 and 6.5.
 
 ## HP-UX
 

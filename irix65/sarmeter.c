@@ -15,8 +15,8 @@ static off_t bufSize = 0;
 static char buf[SAR_BUFSIZE];
 
 static struct {
-    gfxinfo current;
-    gfxinfo last;
+    gfxinfo_t current;
+    gfxinfo_t last;
     SarGfxInfo info;
 } gi;
 
@@ -156,13 +156,13 @@ static void parseBuffer(void) {
             forwardBufferTo(ptr);
 
             /*  data is not complete in buffer  */
-            if (bufSize < (off_t)(24 + sizeof(gfxinfo)))
+            if (bufSize < (off_t)(24 + sizeof(gfxinfo_t)))
                 return;
 
             /*  retrieve gfxinfo structure  */
             ptr = buf + 24;
-            memcpy(&gi.current, ptr, sizeof(gfxinfo));
-            ptr += sizeof(gfxinfo);
+            memcpy(&gi.current, ptr, sizeof(gfxinfo_t));
+            ptr += sizeof(gfxinfo_t);
 
             forwardBufferTo(ptr);
             newGfxInfo();

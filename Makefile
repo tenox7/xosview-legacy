@@ -54,9 +54,9 @@ IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/diskmeter.o \
 
 # The gfx meter is 6.5 only and reads its figures out of the sadc record
 # stream, which 5.3 does not write, so the irix5 target leaves it and that
-# reader out.  The net meter walks the kernel ifnet chain through /dev/kmem,
-# and a 6.5 kernel's pointers do not fit the n32 objects cc builds there, so
-# that one is 5.3 only.
+# reader out.  The net meter resolves ifnet with nlist(), which 6.5 ships
+# only in the o32 libmld, and 6.5 moved the interface counters into
+# if_data, so that one is 5.3 only.
 IRIX5_OBJS = $(IRIX_OBJS) irix65/netmeter.o
 IRIX65_OBJS = $(IRIX_OBJS) irix65/gfxmeter.o irix65/sarmeter.o
 
@@ -211,7 +211,7 @@ hpux11::
 	  PLAT_OBJS="$(HPUX_OBJS)" $(TARGET)
 
 irix65::
-	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iirix65" LIBS="-lX11 -lXpm" \
+	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iirix65" LIBS="-lX11 -lXpm -lrpcsvc" \
 	  PLAT_OBJS="$(IRIX65_OBJS)" $(TARGET)
 
 IRIX5_CC = /usr/tgcware/gcc45/bin/gcc
