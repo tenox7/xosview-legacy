@@ -11,6 +11,11 @@
 #include <sys/sysmp.h>
 #include <sys/sysinfo.h>
 
+/*  5.3 names the cpu states but never counts them.  */
+#ifndef CPU_STATES
+#define CPU_STATES 6
+#endif
+
 #define USED_CPU_STATES (CPU_STATES-1)  /*  SXBRK + IDLE merged  */
 
 typedef struct {

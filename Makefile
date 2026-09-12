@@ -1,3 +1,7 @@
+# IRIX and other vendor makes run recipes with $SHELL, which is csh for the
+# stock root account; every recipe here is Bourne shell.
+SHELL = /bin/sh
+
 CC = gcc
 CFLAGS = -O2 -I.
 LDFLAGS =
@@ -44,9 +48,14 @@ AIX_OBJS = aix/MeterMaker.o aix/cpumeter.o aix/diskmeter.o aix/loadmeter.o \
 HPUX_OBJS = hpux/MeterMaker.o hpux/cpumeter.o hpux/loadmeter.o \
 	hpux/memmeter.o hpux/pagemeter.o hpux/swapmeter.o
 
-# irix65/gfxmeter.c is 6.5 only; the 5.3 target leaves it out.
-IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/diskmeter.o \
-	irix65/loadmeter.o irix65/memmeter.o irix65/sarmeter.o
+IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/loadmeter.o \
+	irix65/memmeter.o
+
+# The gfx meter is 6.5 only, and the disk meter reads its figures out of the
+# 6.5 sadc record stream, which 5.3 does not write; the irix5 target leaves
+# all three out.
+IRIX65_OBJS = $(IRIX_OBJS) irix65/diskmeter.o irix65/gfxmeter.o \
+	irix65/sarmeter.o
 
 OSF1_OBJS = osf1/MeterMaker.o osf1/cpumeter.o osf1/diskmeter.o \
 	osf1/intratemeter.o osf1/loadmeter.o osf1/memmeter.o osf1/netmeter.o \
@@ -200,24 +209,27 @@ hpux11::
 
 irix65::
 	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Iirix65" LIBS="-lX11 -lXpm" \
-	  PLAT_OBJS="$(IRIX_OBJS) irix65/gfxmeter.o" $(TARGET)
+	  PLAT_OBJS="$(IRIX65_OBJS)" $(TARGET)
 
+IRIX5_CC = /usr/tgcware/gcc45/bin/gcc
 IRIX5_GCCLIB = /usr/tgcware/gcc45/lib/gcc/mips-sgi-irix5.3/4.5.3
 IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
 
-# 5.3 has no libXpm and no graphics pipe meter, and gcc from tgcware cannot
-# drive the linker itself: the crt objects and the gcc runtime have to be
-# named by hand.  Correct the two paths above to match what is installed.
-# gcc fakes _COMPILER_VERSION, which makes SGI's offsetof() reach for the
-# MIPSpro builtin __INTADDR__ that gcc does not have.
+# 5.3 has no libXpm, no graphics pipe meter and no snprintf or usleep, and
+# its sadc writes none of the records the disk meter reads.  gcc from
+# tgcware cannot drive the linker itself: the crt objects and the gcc
+# runtime have to be named by hand.  Correct the three paths above to match
+# what is installed.  gcc fakes _COMPILER_VERSION, which makes SGI's
+# offsetof() reach for the MIPSpro builtin __INTADDR__ that gcc does not
+# have.
 irix5::
-	$(MAKE) $(CORE_OBJS) $(IRIX_OBJS) \
-	  CFLAGS="$(CFLAGS) -Iirix65 -DIRIX5 -DNO_XPM -isystem /usr/include \
-	    -U_COMPILER_VERSION"
+	$(MAKE) CC=$(IRIX5_CC) $(CORE_OBJS) $(IRIX_OBJS) irix65/irix5/compat.o \
+	  CFLAGS="$(CFLAGS) -Iirix65 -Iirix65/irix5 -DIRIX5 -DNO_XPM -U_COMPILER_VERSION -include irix65/irix5/compat.h"
 	$(IRIX5_LD) -o $(TARGET) -init __gcc_init -fini __gcc_fini \
 	  /usr/lib/crt1.o $(IRIX5_GCCLIB)/irix-crti.o $(IRIX5_GCCLIB)/crtbegin.o \
 	  -L$(IRIX5_GCCLIB) -L$(IRIX5_GCCLIB)/../../.. -L/usr/lib \
-	  $(CORE_OBJS) $(IRIX_OBJS) -lX11 -lm -lgcc -lgcc_eh -lc \
+	  $(CORE_OBJS) $(IRIX_OBJS) irix65/irix5/compat.o \
+	  -lX11 -lrpcsvc -lm -lgcc -lgcc_eh -lc \
 	  $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
 
 # Tru64 ships no libXpm.  Set CC=gcc where that is what is installed.

@@ -91,8 +91,10 @@ IP27, IP30, IP32 and IP35 by Stefan Eilemann (eilemann@gmail.com).
 The irix5 target builds the same meters for 5.3 minus the gfx meter,
 which needs the 6.5 graphics pipe interface, and its mem meter's file
 system field is just the buffer cache, as 5.3 predates the chunk
-allocator.  Untested on 5.3 hardware; the hand-written link line in the
-Makefile is the part most likely to need work.
+allocator.  5.3 has neither snprintf nor usleep, which irix65/irix5
+supplies, and it needs gcc: IRIX5_CC, IRIX5_GCCLIB and IRIX5_LD at the
+top of that target name the tgcware toolchain and the hand written link
+line it wants.  Tested on IP22.
 
 ## HP-UX
 
