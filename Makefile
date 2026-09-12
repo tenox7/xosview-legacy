@@ -48,14 +48,17 @@ AIX_OBJS = aix/MeterMaker.o aix/cpumeter.o aix/diskmeter.o aix/loadmeter.o \
 HPUX_OBJS = hpux/MeterMaker.o hpux/cpumeter.o hpux/loadmeter.o \
 	hpux/memmeter.o hpux/pagemeter.o hpux/swapmeter.o
 
-IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/loadmeter.o \
-	irix65/memmeter.o
+IRIX_OBJS = irix65/MeterMaker.o irix65/cpumeter.o irix65/diskmeter.o \
+	irix65/loadmeter.o irix65/memmeter.o irix65/pagemeter.o \
+	irix65/swapmeter.o
 
-# The gfx meter is 6.5 only, and the disk meter reads its figures out of the
-# 6.5 sadc record stream, which 5.3 does not write; the irix5 target leaves
-# all three out.
-IRIX65_OBJS = $(IRIX_OBJS) irix65/diskmeter.o irix65/gfxmeter.o \
-	irix65/sarmeter.o
+# The gfx meter is 6.5 only and reads its figures out of the sadc record
+# stream, which 5.3 does not write, so the irix5 target leaves it and that
+# reader out.  The net meter walks the kernel ifnet chain through /dev/kmem,
+# and a 6.5 kernel's pointers do not fit the n32 objects cc builds there, so
+# that one is 5.3 only.
+IRIX5_OBJS = $(IRIX_OBJS) irix65/netmeter.o
+IRIX65_OBJS = $(IRIX_OBJS) irix65/gfxmeter.o irix65/sarmeter.o
 
 OSF1_OBJS = osf1/MeterMaker.o osf1/cpumeter.o osf1/diskmeter.o \
 	osf1/intratemeter.o osf1/loadmeter.o osf1/memmeter.o osf1/netmeter.o \
@@ -223,13 +226,13 @@ IRIX5_LD = /usr/tgcware/mips-sgi-irix5.3/bin/ld
 # offsetof() reach for the MIPSpro builtin __INTADDR__ that gcc does not
 # have.
 irix5::
-	$(MAKE) CC=$(IRIX5_CC) $(CORE_OBJS) $(IRIX_OBJS) irix65/irix5/compat.o \
+	$(MAKE) CC=$(IRIX5_CC) $(CORE_OBJS) $(IRIX5_OBJS) irix65/irix5/compat.o \
 	  CFLAGS="$(CFLAGS) -Iirix65 -Iirix65/irix5 -DIRIX5 -DNO_XPM -U_COMPILER_VERSION -include irix65/irix5/compat.h"
 	$(IRIX5_LD) -o $(TARGET) -init __gcc_init -fini __gcc_fini \
 	  /usr/lib/crt1.o $(IRIX5_GCCLIB)/irix-crti.o $(IRIX5_GCCLIB)/crtbegin.o \
 	  -L$(IRIX5_GCCLIB) -L$(IRIX5_GCCLIB)/../../.. -L/usr/lib \
-	  $(CORE_OBJS) $(IRIX_OBJS) irix65/irix5/compat.o \
-	  -lX11 -lrpcsvc -lm -lgcc -lgcc_eh -lc \
+	  $(CORE_OBJS) $(IRIX5_OBJS) irix65/irix5/compat.o \
+	  -lX11 -lrpcsvc -lmld -lm -lgcc -lgcc_eh -lc \
 	  $(IRIX5_GCCLIB)/crtend.o $(IRIX5_GCCLIB)/irix-crtn.o /usr/lib/crtn.o
 
 # Tru64 ships no libXpm.  Set CC=gcc where that is what is installed.

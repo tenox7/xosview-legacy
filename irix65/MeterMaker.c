@@ -12,6 +12,11 @@
 #include "gfxmeter.h"
 #endif
 #include "diskmeter.h"
+#ifdef IRIX5
+#include "netmeter.h"
+#endif
+#include "pagemeter.h"
+#include "swapmeter.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -64,4 +69,27 @@ void makeMeters(XOSView *xos) {
 
     if (xosview_isresourcetrue(xos, "mem"))
         xosview_addmeter(xos, memmeter_new(xos));
+
+    if (xosview_isresourcetrue(xos, "swap"))
+        xosview_addmeter(xos, swapmeter_new(xos));
+
+    if (xosview_isresourcetrue(xos, "page"))
+        xosview_addmeter(xos,
+                         pagemeter_new(xos,
+                                       atof(xosview_getresource(xos,
+                                            "pageBandwidth"))));
+
+    if (xosview_isresourcetrue(xos, "disk"))
+        xosview_addmeter(xos,
+                         diskmeter_new(xos,
+                                       atof(xosview_getresource(xos,
+                                            "diskBandwidth"))));
+
+#ifdef IRIX5
+    if (xosview_isresourcetrue(xos, "net"))
+        xosview_addmeter(xos,
+                         netmeter_new(xos,
+                                      atof(xosview_getresource(xos,
+                                           "netBandwidth"))));
+#endif
 }

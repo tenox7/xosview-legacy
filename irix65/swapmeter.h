@@ -4,20 +4,16 @@
  *  This file may be distributed under terms of the GPL
  */
 
-#ifndef _DISKMETER_H_
-#define _DISKMETER_H_
+#ifndef _SWAPMETER_H_
+#define _SWAPMETER_H_
 
 #include "fieldmeter.h"
 
 typedef struct {
     FieldMeter f;
-    float maxspeed;
-    double readprev, writeprev;
-    int first;
-    int sinfosz;
     int ok;
-} DiskMeter;
+} SwapMeter;
 
-Meter *diskmeter_new(XOSView *parent, float max);
+Meter *swapmeter_new(XOSView *parent);
 
 #endif

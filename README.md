@@ -83,10 +83,33 @@ skipped rather than plotted as a spike.
 
 ## IRIX
 
-Meters: load, cpu, mem and gfx.  `cpuFormat` takes single, all, auto or
-both to control how multiprocessors are shown.  The gfx meter displays
-swapbuffers/second and forks sadc to read them.  Tested on IP20, IP22,
-IP27, IP30, IP32 and IP35 by Stefan Eilemann (eilemann@gmail.com).
+Meters: load, cpu, mem, swap, page, disk, net and gfx.  `cpuFormat`
+takes single, all, auto or both to control how multiprocessors are
+shown.  The gfx meter displays swapbuffers/second and forks sadc to read
+them.  Tested on IP20, IP22, IP27, IP30, IP32 and IP35 by Stefan
+Eilemann (eilemann@gmail.com).
+
+Load, cpu, mem, page and disk all come from `sysmp(2)` and swap from
+`swapctl(2)`, so none of them need privileges.  The page meter counts
+paging space traffic only, the sar bswin and bswot columns; file paging
+is left to the disk meter.  That one reports the buffer cache and raw
+device blocks sar(1) reports as bread, bwrite, pread and pwrit, totalled
+over every drive, as the kernel keeps no per drive breakdown there.
+
+The interface counters have no system call of their own and are read out
+of /dev/kmem at the address `nlist()` resolves for ifnet in /unix.  That
+is mode 0640 root:sys, so the net meter needs root, or:
+
+```
+chgrp sys /usr/local/bin/xosview
+chmod 2755 /usr/local/bin/xosview
+```
+
+Without it the net meter disables itself and the rest still runs.  Those
+counters are 32 bit and wrap on a busy link; a sample that moves
+backwards is skipped rather than plotted as a spike.  A 6.5 kernel's
+pointers do not fit the n32 objects cc builds there, so the net meter is
+built for 5.3 only.
 
 The irix5 target builds the same meters for 5.3 minus the gfx meter,
 which needs the 6.5 graphics pipe interface, and its mem meter's file
@@ -94,7 +117,8 @@ system field is just the buffer cache, as 5.3 predates the chunk
 allocator.  5.3 has neither snprintf nor usleep, which irix65/irix5
 supplies, and it needs gcc: IRIX5_CC, IRIX5_GCCLIB and IRIX5_LD at the
 top of that target name the tgcware toolchain and the hand written link
-line it wants.  Tested on IP22.
+line it wants.  Tested on IP22; the meters added to both releases are
+untested on 6.5.
 
 ## HP-UX
 

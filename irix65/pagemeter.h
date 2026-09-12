@@ -4,20 +4,20 @@
  *  This file may be distributed under terms of the GPL
  */
 
-#ifndef _DISKMETER_H_
-#define _DISKMETER_H_
+#ifndef _PAGEMETER_H_
+#define _PAGEMETER_H_
 
 #include "fieldmeter.h"
 
 typedef struct {
     FieldMeter f;
+    double pageinfo[2][2];
+    int pageindex;
     float maxspeed;
-    double readprev, writeprev;
-    int first;
     int sinfosz;
     int ok;
-} DiskMeter;
+} PageMeter;
 
-Meter *diskmeter_new(XOSView *parent, float max);
+Meter *pagemeter_new(XOSView *parent, float max);
 
 #endif
