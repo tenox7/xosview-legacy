@@ -166,7 +166,7 @@ dragonflybsd::
 	  PLAT_OBJS="$(BSD_OBJS) $$x" $(TARGET)
 
 sunos5::
-	$(MAKE) CC=cc CFLAGS="$(CFLAGS) -Isunos5" \
+	$(MAKE) CC=gcc CFLAGS="$(CFLAGS) -Isunos5" \
 	  LIBS="-lX11 -lXpm -lkstat -lnsl -lsocket" \
 	  PLAT_OBJS="$(SUNOS5_OBJS)" $(TARGET)
 

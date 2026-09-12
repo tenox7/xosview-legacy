@@ -10,6 +10,7 @@
 #include "fieldmeter.h"
 #include "kstats.h"
 #include <sys/types.h>
+#include <sys/socket.h>
 #include <kstat.h>
 #include <net/if.h>
 
