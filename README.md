@@ -36,43 +36,6 @@ $ make install PREFIX=/usr
 See the man page for the display and the X resources that configure it,
 and COPYING for licensing terms.
 
-## Linux
-
-Meters: load, cpu, mem, disk, swap, page, net, NFS, NFSD, interrupts,
-irqrate, serial, RAID, battery, wireless, coretemp, lmstemp, acpitemp.
-Everything comes from /proc and /sys.
-
-The serial meters read the UART registers through `ioperm()` and `inb()`,
-so xosview has to be setuid root to use them.  It runs fine without that;
-only those meters are lost.  They are x86 only.
-
-The RAID meter parses the pre-2.4 /proc/mdstat format and will not read
-a modern one.  It is off by default.
-
-The net meter totals every interface unless `netIface` names one; prefix
-that with '-' to count everything except it.
-
-coretemp reads the Intel, VIA and AMD sysfs sensors; lmstemp reads
-/sys/class/hwmon or the old /proc/sys/dev/sensors; acpitemp reads the
-thermal zones.
-
-## FreeBSD, NetBSD, OpenBSD, DragonFly BSD
-
-Meters: load, cpu, mem, swap, page, net, disk, interrupts, irqrate,
-battery, coretemp and bsdsensor.  Most figures come from sysctl, the
-rest from kvm.
-
-xosview must run setgid kmem to reach the kvm figures.  Without it, the
-meters that need them disable themselves.
-
-FreeBSD below 7.0, NetBSD below 4.0 and OpenBSD below 5.0 are not
-supported; use xosview 1.9 or older there.
-
-The NetBSD and OpenBSD ports were written by Brian Grayson
-(bgrayson@netbsd.org) and brought up to date by Tomi Tapper
-(tomi.o.tapper@jyu.fi), who also added DragonFly.  The FreeBSD port is
-thanks to Tom Pavel.
-
 ## Solaris
 
 Meters: load, cpu, mem, disk, swap, page, net and irqrate, all through
@@ -206,3 +169,40 @@ chmod 2755 /usr/local/bin/xosview
 ```
 
 Without it the load meter disables itself and the rest still runs.
+
+## Linux
+
+Meters: load, cpu, mem, disk, swap, page, net, NFS, NFSD, interrupts,
+irqrate, serial, RAID, battery, wireless, coretemp, lmstemp, acpitemp.
+Everything comes from /proc and /sys.
+
+The serial meters read the UART registers through `ioperm()` and `inb()`,
+so xosview has to be setuid root to use them.  It runs fine without that;
+only those meters are lost.  They are x86 only.
+
+The RAID meter parses the pre-2.4 /proc/mdstat format and will not read
+a modern one.  It is off by default.
+
+The net meter totals every interface unless `netIface` names one; prefix
+that with '-' to count everything except it.
+
+coretemp reads the Intel, VIA and AMD sysfs sensors; lmstemp reads
+/sys/class/hwmon or the old /proc/sys/dev/sensors; acpitemp reads the
+thermal zones.
+
+## FreeBSD, NetBSD, OpenBSD, DragonFly BSD
+
+Meters: load, cpu, mem, swap, page, net, disk, interrupts, irqrate,
+battery, coretemp and bsdsensor.  Most figures come from sysctl, the
+rest from kvm.
+
+xosview must run setgid kmem to reach the kvm figures.  Without it, the
+meters that need them disable themselves.
+
+FreeBSD below 7.0, NetBSD below 4.0 and OpenBSD below 5.0 are not
+supported; use xosview 1.9 or older there.
+
+The NetBSD and OpenBSD ports were written by Brian Grayson
+(bgrayson@netbsd.org) and brought up to date by Tomi Tapper
+(tomi.o.tapper@jyu.fi), who also added DragonFly.  The FreeBSD port is
+thanks to Tom Pavel.
