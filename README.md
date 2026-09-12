@@ -1,59 +1,62 @@
-xosview legacy
-==============
+# xosview legacy
 
 A rewrite of xosview 1.x in plain and portable C.
 
+![xosview](xosview.png)
+
 Derived from:
 
-  http://www.pogo.org.uk/~mark/xosview/
-  https://github.com/hills/xosview
+- http://www.pogo.org.uk/~mark/xosview/
+- https://github.com/hills/xosview
 
-Building
---------
+## Building
 
-  $ make
-  $ make install
+```
+$ make
+$ make install
+```
 
-"make" picks a target from uname.  Name one to override:
+`make` picks a target from uname.  Name one to override:
 
-  $ make hpux9
+```
+$ make hpux9
+```
 
-The targets are linux, gnu, freebsd, netbsd, openbsd, dragonflybsd,
-sunos5, aix4, aix5, hpux9, hpux10, hpux11, irix5, irix65, osf1, osr6 and
-unixware.  Compilers, flags, libraries and per-platform quirks all live
-in the Makefile; anything there can be overridden on the command line:
+The targets are `linux`, `gnu`, `freebsd`, `netbsd`, `openbsd`,
+`dragonflybsd`, `sunos5`, `aix4`, `aix5`, `hpux9`, `hpux10`, `hpux11`,
+`irix5`, `irix65`, `osf1`, `osr6` and `unixware`.  Compilers, flags,
+libraries and per-platform quirks all live in the Makefile; anything
+there can be overridden on the command line:
 
-  $ make linux CC=clang
-  $ make install PREFIX=/usr
+```
+$ make linux CC=clang
+$ make install PREFIX=/usr
+```
 
 See the man page for the display and the X resources that configure it,
 and COPYING for licensing terms.
 
-
-Linux
------
+## Linux
 
 Meters: load, cpu, mem, disk, swap, page, net, NFS, NFSD, interrupts,
 irqrate, serial, RAID, battery, wireless, coretemp, lmstemp, acpitemp.
 Everything comes from /proc and /sys.
 
-The serial meters read the UART registers through ioperm() and inb(), so
-xosview has to be setuid root to use them.  It runs fine without that;
+The serial meters read the UART registers through `ioperm()` and `inb()`,
+so xosview has to be setuid root to use them.  It runs fine without that;
 only those meters are lost.  They are x86 only.
 
 The RAID meter parses the pre-2.4 /proc/mdstat format and will not read
 a modern one.  It is off by default.
 
-The net meter totals every interface unless netIface names one; prefix
+The net meter totals every interface unless `netIface` names one; prefix
 that with '-' to count everything except it.
 
 coretemp reads the Intel, VIA and AMD sysfs sensors; lmstemp reads
 /sys/class/hwmon or the old /proc/sys/dev/sensors; acpitemp reads the
 thermal zones.
 
-
-FreeBSD, NetBSD, OpenBSD, DragonFly BSD
----------------------------------------
+## FreeBSD, NetBSD, OpenBSD, DragonFly BSD
 
 Meters: load, cpu, mem, swap, page, net, disk, interrupts, irqrate,
 battery, coretemp and bsdsensor.  Most figures come from sysctl, the
@@ -70,26 +73,20 @@ The NetBSD and OpenBSD ports were written by Brian Grayson
 (tomi.o.tapper@jyu.fi), who also added DragonFly.  The FreeBSD port is
 thanks to Tom Pavel.
 
-
-Solaris
--------
+## Solaris
 
 Meters: load, cpu, mem, disk, swap, page, net and irqrate, all through
-kstat and swapctl(2).  None of them need privileges.
+kstat and `swapctl(2)`.  None of them need privileges.
 
 Initial port by Greg Onufer (exodus@cheers.bungi.com), rewritten for
 Solaris by Arno Augustin.
 
-
-GNU/Hurd
---------
+## GNU/Hurd
 
 Meters: load, mem, swap and page, through Mach.  Added by Samuel
 Thibault (samuel.thibault@ens-lyon.org).
 
-
-AIX
----
+## AIX
 
 Meters: load, cpu, mem, swap, page, disk and net.  Supports 4.x and 5.x.
 
@@ -97,7 +94,7 @@ The meters read everything through the interface in aix/aixstats.h,
 which has two implementations.  aix/perfstat.c uses libperfstat, which
 arrived in AIX 5.1, needs no privileges and has 64 bit counters.
 aix/kmem.c is for 4.x, which predates it, and reads /dev/kmem at
-addresses resolved with knlist(): avenrun, sysinfo, vmminfo, ifnet and
+addresses resolved with `knlist()`: avenrun, sysinfo, vmminfo, ifnet and
 iostat.  Real memory and paging space totals have no header there and
 come from the kernel "vmker" symbol; the layout in aix/vmker.h was
 reverse engineered by Jussi Maki for "monitor", is the one AIX 4.1's
@@ -111,19 +108,19 @@ disabled.  5.x needs no privileges.
 The disk meter reports the iostat(1) counters, which the kernel only
 maintains when disk history is on:
 
-  chdev -l sys0 -a iostat=true
+```
+chdev -l sys0 -a iostat=true
+```
 
 The page meter counts paging space traffic only, the vmstat pi and po
 columns; file paging is left to the disk meter.  The cpu meter is a
-single aggregate, so cpuFormat has no effect.  On 4.x the interface and
+single aggregate, so `cpuFormat` has no effect.  On 4.x the interface and
 disk byte counters are 32 bit and wrap; a sample that moves backwards is
 skipped rather than plotted as a spike.
 
+## IRIX
 
-IRIX
-----
-
-Meters: load, cpu, mem and gfx.  cpuFormat takes single, all, auto or
+Meters: load, cpu, mem and gfx.  `cpuFormat` takes single, all, auto or
 both to control how multiprocessors are shown.  The gfx meter displays
 swapbuffers/second and forks sadc to read them.  Tested on IP20, IP22,
 IP27, IP30, IP32 and IP35 by Stefan Eilemann (eilemann@gmail.com).
@@ -134,45 +131,43 @@ system field is just the buffer cache, as 5.3 predates the chunk
 allocator.  Untested on 5.3 hardware; the hand-written link line in the
 Makefile is the part most likely to need work.
 
+## HP-UX
 
-HP-UX
------
-
-Meters: load, cpu, mem, swap and page, all from pstat(2), so none of
+Meters: load, cpu, mem, swap and page, all from `pstat(2)`, so none of
 them need privileges.  Supports 9.x, 10.x and 11.x.
 
 On 9.x the swap meter is the one figure that moved: that release has no
-pss_nblksenabled and keeps block device and file system pool sizes in a
-union instead, which -DNO_PSS_NBLKSENABLED selects.
+`pss_nblksenabled` and keeps block device and file system pool sizes in a
+union instead, which `-DNO_PSS_NBLKSENABLED` selects.
 
-
-Tru64 UNIX
-----------
+## Tru64 UNIX
 
 Meters: load, cpu, mem, swap, page, disk, net and irqrate.  Covers Tru64
 UNIX, Digital UNIX and OSF/1.  Only the net meter needs privileges.
 
-Load, cpu, swap, disk and interrupts come from table(2) -- TBL_LOADAVG,
+Load, cpu, swap, disk and interrupts come from `table(2)` -- TBL_LOADAVG,
 TBL_SYSINFO, TBL_SWAPINFO, TBL_DKINFO and TBL_INTR -- and memory and
-paging from the Mach vm_statistics() call.  The mem meter shows the
+paging from the Mach `vm_statistics()` call.  The mem meter shows the
 inactive queue as cache, where the unified buffer cache parks clean file
 pages; wired UBC pages land under used, which reads high during heavy
 file i/o.  The page meter counts every page fault serviced from disk, as
-vm_statistics() does not separate swap from file paging.
+`vm_statistics()` does not separate swap from file paging.
 
 The disk meter reports the iostat(1) counters.  The kernel totals the
 bytes each drive moves without recording their direction, so this meter
-has one traffic field, coloured with diskUsedColor, in place of the
+has one traffic field, coloured with `diskUsedColor`, in place of the
 separate reads and writes the other ports show.  TBL_INTR likewise keeps
 one machine wide count with no per vector breakdown, so there is an
 irqrate meter but no interrupt meter, and the clock is left out of it.
 
 The interface counters have no system call of their own and are read out
-of /dev/kmem at the address nlist() resolves for ifnet in /vmunix.  That
-is mode 0440 root:mem, so the net meter needs root, or:
+of /dev/kmem at the address `nlist()` resolves for ifnet in /vmunix.
+That is mode 0440 root:mem, so the net meter needs root, or:
 
-  chgrp mem /usr/local/bin/xosview
-  chmod 2755 /usr/local/bin/xosview
+```
+chgrp mem /usr/local/bin/xosview
+chmod 2755 /usr/local/bin/xosview
+```
 
 Without it the net meter disables itself and the rest still runs.  Those
 counters are 32 bit and wrap on a busy link; a sample that moves
@@ -180,35 +175,34 @@ backwards is skipped rather than plotted as a spike.
 
 Tested on Digital UNIX 4.0G.
 
-
-SCO OpenServer 6
-----------------
+## SCO OpenServer 6
 
 Meters: load, cpu, mem and swap, none needing privileges.  OpenServer 5
 is not supported: it has no MAS.
 
 The cpu counters and free memory come from the MAS metric file that
-sar(1) and top read, and swap from swapctl(2).  The kernel publishes
+sar(1) and top read, and swap from `swapctl(2)`.  The kernel publishes
 free memory as an accumulator rather than a level, so the mem meter
-reads zero free for its first sample, and it keeps freefilemem identical
-to freemem, so the file cache cannot be a field of its own.  avenrun
-exists but is never updated, which is why uptime(1) always prints 0.00,
-so the load meter samples the run queue out of /proc and decays those
-into a 1 minute average itself; it needs a minute to settle.
+reads zero free for its first sample, and it keeps `freefilemem`
+identical to `freemem`, so the file cache cannot be a field of its own.
+`avenrun` exists but is never updated, which is why uptime(1) always
+prints 0.00, so the load meter samples the run queue out of /proc and
+decays those into a 1 minute average itself; it needs a minute to
+settle.
 
-
-UnixWare 7
-----------
+## UnixWare 7
 
 Meters: load, cpu, mem and swap.  cpu and memory come from the MAS
-metric file, swap from swapctl(2), and both have the same accumulator
+metric file, swap from `swapctl(2)`, and both have the same accumulator
 and file cache limits as OpenServer.
 
 MAS carries no load average, so it is read out of /dev/kmem at the
-address nlist() resolves for avenrun in /stand/unix.  That needs root,
+address `nlist()` resolves for avenrun in /stand/unix.  That needs root,
 or:
 
-  chgrp sys /usr/local/bin/xosview
-  chmod 2755 /usr/local/bin/xosview
+```
+chgrp sys /usr/local/bin/xosview
+chmod 2755 /usr/local/bin/xosview
+```
 
 Without it the load meter disables itself and the rest still runs.
