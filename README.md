@@ -8,6 +8,7 @@ Derived from:
 
 - http://www.pogo.org.uk/~mark/xosview/
 - https://github.com/hills/xosview
+- https://xosview.sourceforge.net/
 
 ## Building
 
